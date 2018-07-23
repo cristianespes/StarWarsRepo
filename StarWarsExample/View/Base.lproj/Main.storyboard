@@ -192,8 +192,8 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Day of Birth:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="M8X-ZS-reA">
-                                <rect key="frame" x="15" y="397" width="95" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Year of Birth:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="M8X-ZS-reA">
+                                <rect key="frame" x="15" y="397" width="100" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -497,7 +497,7 @@
         <scene sceneID="eF5-N1-lih">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="HIN-KM-YzM" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Films" image="SWTitleTab" id="jcE-S9-Hfp"/>
+                    <tabBarItem key="tabBarItem" title="Films" image="filmTab" id="jcE-S9-Hfp"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="R8A-G0-bKf">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
@@ -552,7 +552,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="SWTitleTab" width="31" height="16"/>
+        <image name="filmTab" width="25" height="25"/>
         <image name="r2d2Tab" width="25" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>

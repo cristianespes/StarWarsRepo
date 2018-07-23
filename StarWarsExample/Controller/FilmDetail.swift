@@ -56,14 +56,18 @@ class FilmDetail: UIViewController {
                 for value in checkCharacter.films {
                     if value == self.film.episode {
                         
-                        // Añadir nuevo personaje al array
-                        self.people += [checkCharacter]
-                        
-                        // Reordenamos el array de Personales por orden de episodios
-                        self.people.sort{ $0.name < $1.name}
-                        
-                        // Recargar la tableView
-                        self.tableView.reloadData()
+                        // Enviamos al hilo principal las siguientes acciones
+                        DispatchQueue.main.async {
+                            
+                            // Añadir nuevo personaje al array
+                            self.people += [checkCharacter]
+                            
+                            // Reordenamos el array de Personales por orden de episodios
+                            self.people.sort{ $0.name < $1.name}
+                            
+                            // Recargar la tableView en el hilo principal
+                            self.tableView.reloadData()
+                        }
                     }
                 }
             } // End - getArrayOfCharacters
@@ -116,6 +120,7 @@ extension FilmDetail : UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let person = self.people[indexPath.row]
         let cellID = "CharacterCell"
         

@@ -52,18 +52,24 @@ class CharacViewController: UITableViewController {
                 return
             }
             
+            
             // Ejecutamos la función para obtener el array con todos los personajes
             getArrayOfCharacters(numberOfCharacters: numberOfObjects) { getCharacter in
+                
                 guard let checkCharacter = getCharacter else { return }
                 
-                // Añadir nuevo personaje al array
-                self.people += [checkCharacter]
+                // Enviamos al hilo principal las siguientes acciones
+                DispatchQueue.main.async {
+                    
+                    // Añadir nuevo personaje al array
+                    self.people += [checkCharacter]
+                    
+                    // Reordenamos el array de Personales por orden de episodios
+                    self.people.sort{ $0.name < $1.name}
                 
-                // Reordenamos el array de Personales por orden de episodios
-                self.people.sort{ $0.name < $1.name}
-                
-                // Recargar la tableView
-                self.tableView.reloadData()
+                    // Recargar la tableView en el hilo principal
+                   self.tableView.reloadData()
+                }
                 
             } // End - getArrayOfCharacters
             
@@ -97,6 +103,7 @@ class CharacViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let person : Person
         if self.searchController.isActive{
             person = self.searchResults[indexPath.row]

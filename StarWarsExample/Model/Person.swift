@@ -132,14 +132,13 @@ func getArrayOfCharacters(numberOfCharacters : Int, completion: @escaping (Perso
                 
                 // Obtenemos los valores del diccionario
                 let name = dataPerson["name"] as! String
-                let gender = dataPerson["gender"] as! String
-                let birth_year = dataPerson["birth_year"] as! String
+                let gender = (dataPerson["gender"] as! String) == "none" || (dataPerson["gender"] as! String) == "n/a" ? "-" : dataPerson["gender"] as! String
+                let birth_year = (dataPerson["birth_year"] as! String) == "unknown" ? "-" : dataPerson["birth_year"] as! String
                 let image = #imageLiteral(resourceName: "contactIcon")
-                
-                let height = dataPerson["height"] as! String
-                let mass = dataPerson["mass"] as! String
-                let hair_color = dataPerson["hair_color"] as! String
-                let skin_color = dataPerson["skin_color"] as! String
+                let height = (dataPerson["height"] as! String) == "unknown" ? "-" : dataPerson["height"] as! String
+                let mass = (dataPerson["mass"] as! String) == "unknown" ? "-" : dataPerson["mass"] as! String
+                let hair_color = (dataPerson["hair_color"] as! String) == "n/a" || (dataPerson["hair_color"] as! String) == "none" ? "-" : dataPerson["hair_color"] as! String
+                let skin_color = (dataPerson["skin_color"] as! String) == "none" ? "-" : dataPerson["skin_color"] as! String
                 let eye_color = dataPerson["eye_color"] as! String
                 
                 // Extraemos el array de films de cada personaje y lo convertimos a Int

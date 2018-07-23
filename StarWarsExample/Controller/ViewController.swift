@@ -47,14 +47,19 @@ class ViewController: UITableViewController {
             getArrayOfFilms(numberOfFilms: numberOfObjects) { getFilm in
                 if let checkFilm = getFilm {
                     
-                    // Añadir nueva película al array
-                    self.films += [checkFilm]
+                    // Enviamos al hilo principal las siguientes acciones
+                    DispatchQueue.main.async {
+                        
+                        // Añadir nueva película al array
+                        self.films += [checkFilm]
+                        
+                        // Reordenamos el array de Películas por orden de episodios
+                        self.films.sort{ $0.episode < $1.episode}
+                        
+                        // Recargar la tableView en el hilo principal
+                        self.tableView.reloadData()
+                    }
                     
-                    // Reordenamos el array de Películas por orden de episodios
-                    self.films.sort{ $0.episode < $1.episode}
-                    
-                    // Recargar la tableView
-                    self.tableView.reloadData()
                 }
             }
         }
@@ -82,7 +87,7 @@ class ViewController: UITableViewController {
         if self.searchController.isActive {
             return self.searchResults.count
         } else {
-            return films.count
+            return self.films.count
         }
     }
     
@@ -92,7 +97,7 @@ class ViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        var film : Film
+        let film : Film
         if self.searchController.isActive{
             film = self.searchResults[indexPath.row]
         } else {
