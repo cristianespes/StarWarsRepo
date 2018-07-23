@@ -27,45 +27,52 @@ class ViewController: UITableViewController {
         // Texto de placeholder
         self.searchController.searchBar.placeholder = "Find film..."
         // Color del texto
-        //self.searchController.searchBar.tintColor = UIColor.blue
+        self.searchController.searchBar.tintColor = UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)
         // Color de la barra de búsqueda
         self.searchController.searchBar.barTintColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1)
         // Mostrar la barra de navegacion durante la búsqueda
         self.searchController.hidesNavigationBarDuringPresentation = false
         
         
-        // Realizamos el recuento de objetos para el recurso de films
-        getNumberOfObjects(nameResource: "films", arrayFilms : films) { getObject in
+        // Ejecutamos en segundo plano la descarga de los datos desde la API
+        DispatchQueue.global().async {
             
-            // Si recibe el número de peliculas
-            guard let numberOfObjects = getObject else {
-                // Si no las llega a recibir
-                print("Ocurrió un error")
-                return
-            }
-            
-            getArrayOfFilms(numberOfFilms: numberOfObjects) { getFilm in
-                if let checkFilm = getFilm {
-                    
-                    // Enviamos al hilo principal las siguientes acciones
-                    DispatchQueue.main.async {
-                        
-                        // Añadir nueva película al array
-                        self.films += [checkFilm]
-                        
-                        // Reordenamos el array de Películas por orden de episodios
-                        self.films.sort{ $0.episode < $1.episode}
-                        
-                        // Recargar la tableView en el hilo principal
-                        self.tableView.reloadData()
-                    }
-                    
+            // Realizamos el recuento de objetos para el recurso de films
+            getNumberOfObjects(nameResource: "films", arrayFilms : self.films) { getObject in
+                
+                // Si recibe el número de peliculas
+                guard let numberOfObjects = getObject else {
+                    // Si no las llega a recibir
+                    print("Ocurrió un error")
+                    return
                 }
-            }
-        }
- 
+                
+                getArrayOfFilms(numberOfFilms: numberOfObjects) { getFilm in
+                    if let checkFilm = getFilm {
+                        
+                        // Enviamos al hilo principal las siguientes acciones
+                        DispatchQueue.main.async {
+                            
+                            // Añadir nueva película al array
+                            self.films += [checkFilm]
+                            
+                            // Reordenamos el array de Películas por orden de episodios
+                            self.films.sort{ $0.episode < $1.episode}
+                            
+                            // Recargar la tableView en el hilo principal
+                            self.tableView.reloadData()
+                            
+                        } // End - DispatchQueue.main.async
+                        
+                    } // End - if
+                    
+                } // End - getArrayOfFilms
+                
+            } // End - getNumberOfObjects
+            
+        } // End - DispatchQueue.global().async
         
-    }
+    } // End - viewDidLoad
     
     // Ocultar menú superior
     func prefersStatusBarHidden() -> Bool {

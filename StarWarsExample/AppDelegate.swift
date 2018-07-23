@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         // Tiempo de esperar al arranque de la App
-        Thread.sleep(forTimeInterval: 4.0)
+        Thread.sleep(forTimeInterval: 2.0)
         
         // Configuracion NavBar
         // Color barra de navegación

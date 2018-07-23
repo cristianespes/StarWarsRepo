@@ -37,42 +37,48 @@ class FilmDetail: UIViewController {
         // Texto descripcion no editable
         self.descriptionText.isEditable = false
         
-        
-        // Realizamos el recuento de objetos para el recurso people de la API
-        getNumberOfObjects(nameResource: "people", arrayPeople : people) { getObject in
+        // Ejecutamos en segundo plano la descarga de los datos desde la API
+        DispatchQueue.global().async {
             
-            
-            // Si recibe el número de peliculas
-            guard let numberOfObjects = getObject else {
-                // Si no las llega a recibir
-                print("Ocurrió un error")
-                return
-            }
-            
-            // Ejecutamos la función para obtener el array con todos los personajes
-            getArrayOfCharacters(numberOfCharacters: numberOfObjects) { getCharacter in
-                guard let checkCharacter = getCharacter else { return }
+            // Realizamos el recuento de objetos para el recurso people de la API
+            getNumberOfObjects(nameResource: "people", arrayPeople : self.people) { getObject in
                 
-                for value in checkCharacter.films {
-                    if value == self.film.episode {
-                        
-                        // Enviamos al hilo principal las siguientes acciones
-                        DispatchQueue.main.async {
-                            
-                            // Añadir nuevo personaje al array
-                            self.people += [checkCharacter]
-                            
-                            // Reordenamos el array de Personales por orden de episodios
-                            self.people.sort{ $0.name < $1.name}
-                            
-                            // Recargar la tableView en el hilo principal
-                            self.tableView.reloadData()
-                        }
-                    }
+                
+                // Si recibe el número de peliculas
+                guard let numberOfObjects = getObject else {
+                    // Si no las llega a recibir
+                    print("Ocurrió un error")
+                    return
                 }
-            } // End - getArrayOfCharacters
+                
+                // Ejecutamos la función para obtener el array con todos los personajes
+                getArrayOfCharacters(numberOfCharacters: numberOfObjects) { getCharacter in
+                    guard let checkCharacter = getCharacter else { return }
+                    
+                    for value in checkCharacter.films {
+                        if value == self.film.episode {
+                            
+                            // Enviamos al hilo principal las siguientes acciones
+                            DispatchQueue.main.async {
+                                
+                                // Añadir nuevo personaje al array
+                                self.people += [checkCharacter]
+                                
+                                // Reordenamos el array de Personales por orden de episodios
+                                self.people.sort{ $0.name < $1.name}
+                                
+                                // Recargar la tableView en el hilo principal
+                                self.tableView.reloadData()
+                                
+                            } // End - DispatchQueue.main.async
+                            
+                        } // End - if
+                    }
+                } // End - getArrayOfCharacters
+                
+            } // End - getNumberOfObjects
             
-        } // End - getNumberOfObjects
+        } // End - DispatchQueue.global().async
         
         
     } // End - viewDidLoad

@@ -28,7 +28,7 @@ class CharacViewController: UITableViewController {
         // Texto de placeholder
         self.searchController.searchBar.placeholder = "Find character..."
         // Color del texto
-        //self.searchController.searchBar.tintColor = UIColor.blue
+        self.searchController.searchBar.tintColor = UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)
         // Color de la barra de búsqueda
         self.searchController.searchBar.barTintColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1)
         // Mostrar la barra de navegacion durante la búsqueda
@@ -40,40 +40,43 @@ class CharacViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
-        
-        // Realizamos el recuento de objetos para el recurso people de la API
-        getNumberOfObjects(nameResource: "people", arrayPeople : people) { getObject in
+        // Ejecutamos en segundo plano la descarga de los datos desde la API
+        DispatchQueue.global().async {
             
-            
-            // Si recibe el número de peliculas
-            guard let numberOfObjects = getObject else {
-                // Si no las llega a recibir
-                print("Ocurrió un error")
-                return
-            }
-            
-            
-            // Ejecutamos la función para obtener el array con todos los personajes
-            getArrayOfCharacters(numberOfCharacters: numberOfObjects) { getCharacter in
+            // Realizamos el recuento de objetos para el recurso people de la API
+            getNumberOfObjects(nameResource: "people", arrayPeople : self.people) { getObject in
                 
-                guard let checkCharacter = getCharacter else { return }
-                
-                // Enviamos al hilo principal las siguientes acciones
-                DispatchQueue.main.async {
-                    
-                    // Añadir nuevo personaje al array
-                    self.people += [checkCharacter]
-                    
-                    // Reordenamos el array de Personales por orden de episodios
-                    self.people.sort{ $0.name < $1.name}
-                
-                    // Recargar la tableView en el hilo principal
-                   self.tableView.reloadData()
+                // Si recibe el número de peliculas
+                guard let numberOfObjects = getObject else {
+                    // Si no las llega a recibir
+                    print("Ocurrió un error")
+                    return
                 }
                 
-            } // End - getArrayOfCharacters
+                // Ejecutamos la función para obtener el array con todos los personajes
+                getArrayOfCharacters(numberOfCharacters: numberOfObjects) { getCharacter in
+                    
+                    guard let checkCharacter = getCharacter else { return }
+                    
+                    // Enviamos al hilo principal las siguientes acciones
+                    DispatchQueue.main.async {
+                        
+                        // Añadir nuevo personaje al array
+                        self.people += [checkCharacter]
+                        
+                        // Reordenamos el array de Personales por orden de episodios
+                        self.people.sort{ $0.name < $1.name}
+                        
+                        // Recargar la tableView en el hilo principal
+                        self.tableView.reloadData()
+                        
+                    } // End - DispatchQueue
+                    
+                } // End - getArrayOfCharacters
+                
+            } // End - getNumberOfObjects
             
-        } // End - getNumberOfObjects
+        } // End - DispatchQueue.global().async
         
         
     } // End - viewDidLoad
