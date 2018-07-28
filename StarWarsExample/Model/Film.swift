@@ -9,35 +9,23 @@
 import Foundation
 import UIKit
 
-/*
-struct Film : Decodable {
-    
-    let title : String
-    /*let episode_id : Int
-    let opening_crawl : String
-    let director : String
-    let producer : String
-    let release_date : String
-    let created : String
-    let edited : String*/
-    //let image : UIImage
-    
-}*/
 
 class Film {
     
-    var title : String
-    var opening_crawl: String
-    var release_date: String
-    var episode: Int
-    var image : UIImage
+    let title : String
+    let opening_crawl: String
+    let release_date: String
+    let episode: Int
+    let image : UIImage
+    let url : Int
     
-    init(title: String, description: String, year: String, episode: Int, image: UIImage) {
+    init(title: String, description: String, year: String, episode: Int, image: UIImage, url : Int) {
         self.title = title
         self.opening_crawl = description
         self.release_date = year
         self.episode = episode
         self.image = image
+        self.url = url
     }
     
 }
@@ -132,6 +120,9 @@ func getArrayOfFilms(numberOfFilms : Int, completion: @escaping (Film?) -> Void 
                 let description = dataFilm["opening_crawl"] as! String
                 let episode = dataFilm["episode_id"] as! Int
                 let image = UIImage(named: "film\(episode)")
+                let auxURL = dataFilm["url"] as! String
+                let url = convertStringToInt(string: auxURL)
+                
                 
                 var year = dataFilm["release_date"] as! String
                 // Convertimos la fecha: yyyy-MM-dd => dd-MM-yyyy
@@ -145,7 +136,7 @@ func getArrayOfFilms(numberOfFilms : Int, completion: @escaping (Film?) -> Void 
                 
                 
                 // Almacenamos los valores obtenidos en una instancia de Film
-                let film = Film(title: title, description: description, year: year, episode: episode, image: image!)
+                let film = Film(title: title, description: description, year: year, episode: episode, image: image!, url: url)
                 //print("TITULO PELICULA: \(film.title)")
                 
                 //arrayFilms += [film]

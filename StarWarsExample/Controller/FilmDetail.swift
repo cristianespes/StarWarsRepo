@@ -56,7 +56,9 @@ class FilmDetail: UIViewController {
                     guard let checkCharacter = getCharacter else { return }
                     
                     for value in checkCharacter.films {
-                        if value == self.film.episode {
+                        
+                        if value == self.film.url {
+                        // print("La película es la \(value) y el episodio es \(self.film.episode)")
                             
                             // Enviamos al hilo principal las siguientes acciones
                             DispatchQueue.main.async {

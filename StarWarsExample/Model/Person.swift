@@ -159,18 +159,3 @@ func getArrayOfCharacters(numberOfCharacters : Int, completion: @escaping (Perso
     }
 }
 
-// ---------------------------------------------------------------------------------
-
-func convertArrayStringToInt(arrayOfString: [String]) -> [Int] {
-    
-    var arrayOfNumber : [Int] = []
-    
-    for value in arrayOfString {
-        if let number = Int(value.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()) {
-            arrayOfNumber += [number]
-        }
-    }
-    
-    return arrayOfNumber
-}
-
