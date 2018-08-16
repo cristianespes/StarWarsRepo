@@ -42,6 +42,12 @@ class CharacterDetail: UIViewController {
         // Título de la cabecera
         self.title = self.person.name
         
+        
+        // Anulamos el título largo de la cabecera en esta pantalla
+        if #available(iOS 11.0, *) {
+            navigationItem.largeTitleDisplayMode = .never
+        }
+        
     }
     
     // Ocultar menú superior

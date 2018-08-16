@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 struct Resource : Decodable {
     let count : Int
@@ -38,4 +39,25 @@ func convertStringToInt(string: String) -> Int {
     }
     
     return number
+}
+
+// ---------------------------------------------------------------------------------
+
+// Método para mostrar alertas
+func showAlert(vc: UIViewController, message: String){
+    let alert = UIAlertController(title: "Warning", message: message, preferredStyle: UIAlertControllerStyle.alert)
+    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
+    vc.present(alert, animated: true, completion: nil)
+}
+
+// ---------------------------------------------------------------------------------
+
+// Método para ocultar refresher
+func hideRefresher(refresher: UIRefreshControl) {
+    // Ocultamos la ruleta
+    let deadline = DispatchTime.now() + .milliseconds(500)
+    DispatchQueue.main.asyncAfter(deadline: deadline) {
+        // Finalizamos el UIRefreshControl
+        refresher.endRefreshing()
+    }
 }

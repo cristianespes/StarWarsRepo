@@ -14,31 +14,124 @@ class CharacViewController: UITableViewController {
     var people : [Person] = []
     var searchResults : [Person] = []
     var searchController : UISearchController!
+    
+    lazy var refresher: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.tintColor = UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)
+        //refreshControl.attributedTitle = NSAttributedString(string: "Updating Characters...", attributes: [NSAttributedStringKey.foregroundColor: UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)])
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        
+        return refreshControl
+    }()
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Aplicamos la configuración inicial en la vista
+        self.viewInitialConfiguration()
+        
+        // Asignar el control de refresco la página
+        if #available(iOS 10.0, *) {
+            // >= iOS 10
+            tableView.refreshControl = self.refresher
+        } else {
+            // <= iOS 9 (Before iOS 10)
+            tableView.addSubview(self.refresher)
+        }
+        
+        // Descargar datos de las películas de la API
+        self.downloadCharacterDataFromAPI()
+        
+        
+    } // End - viewDidLoad
+    
+    // Ocultar menú superior
+    override var prefersStatusBarHidden: Bool {
+        return false
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    
+    // MARK: - Refresh data
+    
+    @objc func refreshData() {
+        
+        // Limpiamos la tableView
+        self.people.removeAll()
+        tableView.reloadData()
+        
+        // Descargamos los datos de la API
+        self.downloadCharacterDataFromAPI()
+        
+        // Ocultamos la ruleta
+        hideRefresher(refresher: refresher)
+        
+    }
+    
+    // MARK: - Initial Configuration of the View
+    
+    func viewInitialConfiguration() {
+        
+        // Asignamos título largo a la barra de navegación
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+            navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)]
+            navigationItem.largeTitleDisplayMode = .automatic
+        }
+        
         // Inicializamos la barra de búsqueda
         self.searchController = UISearchController(searchResultsController: nil)
-        self.tableView.tableHeaderView = self.searchController.searchBar
+        
+        if #available(iOS 11.0, *) {
+            // Asignamos el searchController a la barra de navegación
+            navigationItem.searchController = self.searchController
+            navigationItem.hidesSearchBarWhenScrolling = false
+            
+            // Color del texto dentro del searchController
+            UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).defaultTextAttributes = [NSAttributedStringKey.foregroundColor.rawValue: UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)]
+            
+        } else {
+            // Fallback on earlier versions
+            
+            // Asignamos el searchController a la cabecera de la tabla
+            self.tableView.tableHeaderView = self.searchController.searchBar
+            // Color de la barra de búsqueda
+            self.searchController.searchBar.barTintColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1)
+        }
+        
         // Asignamos los métodos del delegado
         self.searchController.searchResultsUpdater = self
         // Controla el contenido que se difumina
         self.searchController.dimsBackgroundDuringPresentation = false
         // Texto de placeholder
         self.searchController.searchBar.placeholder = "Find character..."
-        // Color del texto
+        // Color del texto "Cancelar"
         self.searchController.searchBar.tintColor = UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)
-        // Color de la barra de búsqueda
-        self.searchController.searchBar.barTintColor = UIColor(red: 38.0/255.0, green: 38.0/255.0, blue: 38.0/255.0, alpha: 1)
         // Mostrar la barra de navegacion durante la búsqueda
         self.searchController.hidesNavigationBarDuringPresentation = false
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+    }
+    
+    
+    // MARK: - Downloading character data from API
+    
+    func downloadCharacterDataFromAPI() {
+        
+        // Comprobamos conexión a Internet para descargar los datos
+        guard CheckInternet.isConnectedToNetwork() else {
+            // Mostramos alerta de no conexión
+            showAlert(vc: self, message: "Your device is not connected with internet")
+            // Ocultamos la ruleta
+            hideRefresher(refresher: refresher)
+            return
+        }
+        
+        // Si hay acceso a Internet...
         
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
@@ -78,18 +171,8 @@ class CharacViewController: UITableViewController {
             
         } // End - DispatchQueue.global().async
         
-        
-    } // End - viewDidLoad
+    } // End - downloadCharacterDataFromAPI()
     
-    // Ocultar menú superior
-    override var prefersStatusBarHidden: Bool {
-        return false
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
 
     // MARK: - Table view data source
 

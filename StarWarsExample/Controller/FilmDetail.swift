@@ -32,10 +32,42 @@ class FilmDetail: UIViewController {
         self.yearText.text = self.film.release_date
         
         // Título de la cabecera
-        self.title = self.film.title
+        self.navigationItem.title = self.film.title
+        
+        // Anulamos el título largo de la cabecera en esta pantalla
+        if #available(iOS 11.0, *) {
+            self.navigationItem.largeTitleDisplayMode = .never
+        }
         
         // Texto descripcion no editable
         self.descriptionText.isEditable = false
+        
+        // Descargar datos de los personajes de la película seleccionada
+        self.downloadCharacterDataOfTheFilmFromAPI()
+        
+    } // End - viewDidLoad
+    
+    // Título barra de navegación cuando aparezca la pantalla
+    /*override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // Título de la cabecera
+        self.navigationItem.title = self.film.title
+    }*/
+    
+    // Ocultar menú superior
+    override var prefersStatusBarHidden: Bool {
+        return false
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    
+    // MARK: - Downloading character data of the film from API
+    
+    func downloadCharacterDataOfTheFilmFromAPI() {
         
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
@@ -58,7 +90,7 @@ class FilmDetail: UIViewController {
                     for value in checkCharacter.films {
                         
                         if value == self.film.url {
-                        // print("La película es la \(value) y el episodio es \(self.film.episode)")
+                            // print("La película es la \(value) y el episodio es \(self.film.episode)")
                             
                             // Enviamos al hilo principal las siguientes acciones
                             DispatchQueue.main.async {
@@ -82,19 +114,8 @@ class FilmDetail: UIViewController {
             
         } // End - DispatchQueue.global().async
         
-        
-    } // End - viewDidLoad
+    } // End - downloadCharacterDataOfTheFilmFromAPI()
     
-    
-    // Ocultar menú superior
-    override var prefersStatusBarHidden: Bool {
-        return false
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
     // MARK: - Segue
     
@@ -102,14 +123,27 @@ class FilmDetail: UIViewController {
         if segue.identifier == "showCharacterDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow{
                 // Le pasamos el objeto
-                let selectedPerson  = self.self.people[indexPath.row]
+                let selectedPerson  = self.people[indexPath.row]
                 
                 let destinationViewController = segue.destination as! CharacterDetail
                 destinationViewController.person = selectedPerson
                 // Ocultar pestañas en la siguiente ventana
                 //destinationViewController.hidesBottomBarWhenPushed = true
                 // Texto del item de navegación (botón atrás)
-                navigationItem.title = "Back"
+                //self.navigationItem.title = "Back"
+                
+            }
+        }
+        
+        if segue.identifier == "showImageDetail" {
+            if let image = self.filmImageView {
+                
+                let destinationViewController = segue.destination as! ImageViewController
+                destinationViewController.getImage = image
+                // Ocultar pestañas en la siguiente ventana
+                //destinationViewController.hidesBottomBarWhenPushed = true
+                // Texto del item de navegación (botón atrás)
+                //self.navigationItem.title = "Back"
             }
         }
     }
@@ -121,6 +155,32 @@ extension FilmDetail : UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
+    }
+    
+    /*func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return Characters of films
+    }*/
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let view = UIView()
+        
+        let label = UILabel()
+        label.text = "Characters of the film"
+        label.textColor = UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)
+        //label.font = label.font.withSize(25)
+        label.font = UIFont(name:"HelveticaNeue-Bold", size: 20.0)
+        label.backgroundColor = UIColor.black
+        label.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 35)
+        label.adjustsFontSizeToFitWidth = true
+        label.textAlignment = .center
+        view.addSubview(label)
+        
+        return view
+    }
+    
+    // Esté método va junto con el anterior: viewForHeaderInSection
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 35
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
