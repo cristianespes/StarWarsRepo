@@ -14,6 +14,7 @@ class ViewController: UITableViewController {
     var searchResults : [Film] = []
     var searchController : UISearchController!
     
+    
     lazy var refresher: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.tintColor = UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)
@@ -22,6 +23,9 @@ class ViewController: UITableViewController {
         
         return refreshControl
     }()
+    
+    // Crea el Activity Indicator
+    let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.gray)
     
     
     override func viewDidLoad() {
@@ -55,6 +59,7 @@ class ViewController: UITableViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
     
     // MARK: - Refresh data
     
@@ -135,6 +140,9 @@ class ViewController: UITableViewController {
         
         // Si hay acceso a Internet...
         
+        // Iniciamos la animación de carga
+        startActivityIndicator(activity: self.activityIndicator, view: self.view)
+        
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
             
@@ -148,17 +156,28 @@ class ViewController: UITableViewController {
                     return
                 }
                 
-                getArrayOfFilms(numberOfFilms: numberOfObjects) { getFilm in
+                getArrayOfFilms(numberOfFilms: numberOfObjects, completion: {
+                    getFilm, successCount  in
                     if let checkFilm = getFilm {
-                        
-                        // Enviamos al hilo principal las siguientes acciones
-                        DispatchQueue.main.async {
                             
                             // Añadir nueva película al array
                             self.films += [checkFilm]
                             
                             // Reordenamos el array de Películas por orden de episodios
                             self.films.sort{ $0.episode < $1.episode}
+                        
+                    } // End - if
+                    
+                    guard let count = successCount else { return }
+                    
+                    // Cuando se haya completado el array con todos los objetos
+                    if count == self.films.count {
+                        
+                        // Enviamos al hilo principal las siguientes acciones
+                        DispatchQueue.main.async {
+                            
+                            // Paramos la animación de carga
+                            self.activityIndicator.stopAnimating()
                             
                             // Recargar la tableView en el hilo principal
                             self.tableView.reloadData()
@@ -167,7 +186,9 @@ class ViewController: UITableViewController {
                         
                     } // End - if
                     
-                } // End - getArrayOfFilms
+                    
+                }) // End - getArrayOfFilms
+                
                 
             } // End - getNumberOfObjects
             
@@ -234,7 +255,7 @@ class ViewController: UITableViewController {
                 if self.searchController.isActive{
                     selectedFilm = self.searchResults[indexPath.row]
                 } else {
-                    selectedFilm = self.self.films[indexPath.row]
+                    selectedFilm = self.films[indexPath.row]
                 }
                 
                 //let selectedFilm = self.films[indexPath.row]

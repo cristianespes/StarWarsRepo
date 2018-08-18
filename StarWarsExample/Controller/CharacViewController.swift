@@ -24,6 +24,9 @@ class CharacViewController: UITableViewController {
         return refreshControl
     }()
     
+    // Crea el Activity Indicator
+    let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.gray)
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -133,6 +136,9 @@ class CharacViewController: UITableViewController {
         
         // Si hay acceso a Internet...
         
+        // Iniciamos la animación de carga
+        startActivityIndicator(activity: self.activityIndicator, view: self.view)
+        
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
             
@@ -147,23 +153,30 @@ class CharacViewController: UITableViewController {
                 }
                 
                 // Ejecutamos la función para obtener el array con todos los personajes
-                getArrayOfCharacters(numberOfCharacters: numberOfObjects) { getCharacter in
+                getArrayOfCharacters(numberOfCharacters: numberOfObjects) { getCharacter, successCount in
                     
                     guard let checkCharacter = getCharacter else { return }
-                    
-                    // Enviamos al hilo principal las siguientes acciones
-                    DispatchQueue.main.async {
                         
                         // Añadir nuevo personaje al array
                         self.people += [checkCharacter]
                         
                         // Reordenamos el array de Personales por orden de episodios
                         self.people.sort{ $0.name < $1.name}
-                        
-                        // Recargar la tableView en el hilo principal
-                        self.tableView.reloadData()
-                        
-                    } // End - DispatchQueue
+                    
+                    guard let finalCount = successCount else { return }
+                    
+                    if finalCount == self.people.count {
+                        // Enviamos al hilo principal las siguientes acciones
+                        DispatchQueue.main.async {
+                            
+                            // Paramos la animación de carga
+                            self.activityIndicator.stopAnimating()
+                            
+                            // Recargar la tableView en el hilo principal
+                            self.tableView.reloadData()
+                            
+                        } // End - DispatchQueue
+                    } // End - if
                     
                 } // End - getArrayOfCharacters
                 

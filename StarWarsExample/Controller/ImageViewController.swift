@@ -15,6 +15,8 @@ class ImageViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet var image: UIImageView!
     var getImage : UIImageView!
     
+    var film : Film!
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,13 +24,39 @@ class ImageViewController: UIViewController, UIScrollViewDelegate {
         self.view.backgroundColor = .black
         
         // Título de la cabecera
-        //self.title = "Cover"
+        setTitleToHeader(episode: self.film.episode)
         
         self.scrollView.minimumZoomScale = 1.0
         self.scrollView.maximumZoomScale = 3.0
 
        //self.image = self.receivedImage
-        self.image.image = self.getImage.image
+        //self.image.image = self.getImage.image
+        self.image.image = self.film.image
+    }
+    
+    func setTitleToHeader(episode: Int) {
+        switch episode {
+        case 1:
+            self.title = "Episode I"
+        case 2:
+            self.title = "Episode II"
+        case 3:
+            self.title = "Episode III"
+        case 4:
+            self.title = "Episode IV"
+        case 5:
+            self.title = "Episode V"
+        case 6:
+            self.title = "Episode VI"
+        case 7:
+            self.title = "Episode VII"
+        case 8:
+            self.title = "Episode VIII"
+        case 9:
+            self.title = "Episode IX"
+        default:
+            self.title = "Cover"
+        }
     }
     
     // MARK: - UIScrollViewDelegate

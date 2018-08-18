@@ -18,14 +18,16 @@ class Film {
     let episode: Int
     let image : UIImage
     let url : Int
+    let characters: [Int]
     
-    init(title: String, description: String, year: String, episode: Int, image: UIImage, url : Int) {
+    init(title: String, description: String, year: String, episode: Int, image: UIImage, url : Int, characters: [Int]) {
         self.title = title
         self.opening_crawl = description
         self.release_date = year
         self.episode = episode
         self.image = image
         self.url = url
+        self.characters = characters
     }
     
 }
@@ -82,7 +84,9 @@ func getNumberOfObjects(nameResource: String, arrayFilms : [Film], completion: @
 
 // ---------------------------------------------------------------------------------
 
-func getArrayOfFilms(numberOfFilms : Int, completion: @escaping (Film?) -> Void ) {
+func getArrayOfFilms(numberOfFilms : Int, completion: @escaping (Film?, Int?) -> Void ) {
+    
+    var successCount = numberOfFilms
     
     for value in 1...numberOfFilms {
         
@@ -91,7 +95,7 @@ func getArrayOfFilms(numberOfFilms : Int, completion: @escaping (Film?) -> Void 
         // Check that the URL we’ve provided is valid
         guard let urlRequest = URL(string: urlString) else {
             print("Error: cannot create URL")
-            completion(nil)
+            completion(nil, nil)
             return
         }
         
@@ -105,7 +109,8 @@ func getArrayOfFilms(numberOfFilms : Int, completion: @escaping (Film?) -> Void 
             // Check if any error exists
             if let error = error {
                 print(error)
-                completion(nil)
+                successCount -= 1
+                completion(nil, nil)
                 return
             }
             
@@ -115,6 +120,15 @@ func getArrayOfFilms(numberOfFilms : Int, completion: @escaping (Film?) -> Void 
             do {
                 let dataFilm = try JSONSerialization.jsonObject(with: datos) as! [String:Any]
                 
+                // Comprobación de que el objeto existe o no está vacío
+                if let error = dataFilm["detail"] as? String {
+                    print("Error: Data \(value) \(error)")
+                    // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
+                    successCount -= 1
+                    completion(nil, nil)
+                    return
+                }
+                
                 // Obtenemos los valores del diccionario
                 let title = dataFilm["title"] as! String
                 let description = dataFilm["opening_crawl"] as! String
@@ -123,26 +137,34 @@ func getArrayOfFilms(numberOfFilms : Int, completion: @escaping (Film?) -> Void 
                 let auxURL = dataFilm["url"] as! String
                 let url = convertStringToInt(string: auxURL)
                 
+                // Recogemos los personajes de la película
+                let auxCharacters = dataFilm["characters"] as! [String]
+                var characters : [Int] = []
+                for value in auxCharacters {
+                    characters += [convertStringToInt(string: value)]
+                }
+                
                 
                 var year = dataFilm["release_date"] as! String
                 // Convertimos la fecha: yyyy-MM-dd => dd-MM-yyyy
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "yyyy-MM-dd"
                 let date = dateFormatter.date(from: year)
-                dateFormatter.dateFormat = "dd-MM-yyyy"
+                dateFormatter.dateFormat = "MM-dd-yyyy"
                 year = dateFormatter.string(from: date!)
                 
                 year = "Premiere: " + year
                 
                 
                 // Almacenamos los valores obtenidos en una instancia de Film
-                let film = Film(title: title, description: description, year: year, episode: episode, image: image!, url: url)
+                let film = Film(title: title, description: description, year: year, episode: episode, image: image!, url: url,  characters: characters)
                 //print("TITULO PELICULA: \(film.title)")
                 
                 //arrayFilms += [film]
                 //print("El array vale: \(arrayFilms.count)")
-                completion(film)
+                completion(film, successCount)
             } catch {
+                successCount -= 1
                 debugPrint(error)
             }
         }

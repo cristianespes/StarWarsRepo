@@ -32,7 +32,11 @@ class FilmDetail: UIViewController {
         self.yearText.text = self.film.release_date
         
         // Título de la cabecera
-        self.navigationItem.title = self.film.title
+        self.title = self.film.title
+        
+        // Título del BackButton en las vistas siguientes
+        let backItem = UIBarButtonItem(title: "Back", style: .plain, target: nil, action: nil)
+        navigationItem.backBarButtonItem = backItem
         
         // Anulamos el título largo de la cabecera en esta pantalla
         if #available(iOS 11.0, *) {
@@ -71,46 +75,32 @@ class FilmDetail: UIViewController {
         
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
-            
-            // Realizamos el recuento de objetos para el recurso people de la API
-            getNumberOfObjects(nameResource: "people", arrayPeople : self.people) { getObject in
                 
-                
-                // Si recibe el número de peliculas
-                guard let numberOfObjects = getObject else {
-                    // Si no las llega a recibir
-                    print("Ocurrió un error")
-                    return
-                }
-                
-                // Ejecutamos la función para obtener el array con todos los personajes
-                getArrayOfCharacters(numberOfCharacters: numberOfObjects) { getCharacter in
+                // Ejecutamos la función para obtener el array con todos los personaje
+                getArrayOfCharactersFromFilm(film: self.film)
+                { getCharacter, successCount in
+                    
                     guard let checkCharacter = getCharacter else { return }
                     
-                    for value in checkCharacter.films {
-                        
-                        if value == self.film.url {
-                            // print("La película es la \(value) y el episodio es \(self.film.episode)")
+                    // Añadir nuevo personaje al array
+                    self.people += [checkCharacter]
+                    
+                    // Reordenamos el array de Personales por orden de episodios
+                    self.people.sort{ $0.name < $1.name}
+                    
+                    guard let finalCount = successCount else { return }
+                    
+                    if finalCount == self.people.count {
+                        // Enviamos al hilo principal las siguientes acciones
+                        DispatchQueue.main.async {
                             
-                            // Enviamos al hilo principal las siguientes acciones
-                            DispatchQueue.main.async {
-                                
-                                // Añadir nuevo personaje al array
-                                self.people += [checkCharacter]
-                                
-                                // Reordenamos el array de Personales por orden de episodios
-                                self.people.sort{ $0.name < $1.name}
-                                
-                                // Recargar la tableView en el hilo principal
-                                self.tableView.reloadData()
-                                
-                            } // End - DispatchQueue.main.async
+                            // Recargar la tableView en el hilo principal
+                            self.tableView.reloadData()
                             
-                        } // End - if
-                    }
-                } // End - getArrayOfCharacters
-                
-            } // End - getNumberOfObjects
+                        } // End - DispatchQueue
+                    } // End - if
+                    
+                } // End - getArrayOfCharactersFromFilm
             
         } // End - DispatchQueue.global().async
         
@@ -129,21 +119,16 @@ class FilmDetail: UIViewController {
                 destinationViewController.person = selectedPerson
                 // Ocultar pestañas en la siguiente ventana
                 //destinationViewController.hidesBottomBarWhenPushed = true
-                // Texto del item de navegación (botón atrás)
-                //self.navigationItem.title = "Back"
-                
             }
         }
         
         if segue.identifier == "showImageDetail" {
-            if let image = self.filmImageView {
+            if let film = self.film {
                 
+                // Le pasamos el objeto Pelicula
+                let selectedFilm : Film = film
                 let destinationViewController = segue.destination as! ImageViewController
-                destinationViewController.getImage = image
-                // Ocultar pestañas en la siguiente ventana
-                //destinationViewController.hidesBottomBarWhenPushed = true
-                // Texto del item de navegación (botón atrás)
-                //self.navigationItem.title = "Back"
+                destinationViewController.film = selectedFilm
             }
         }
     }

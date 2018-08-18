@@ -61,3 +61,23 @@ func hideRefresher(refresher: UIRefreshControl) {
         refresher.endRefreshing()
     }
 }
+
+// ---------------------------------------------------------------------------------
+
+// MARK: - Activity Indicator
+
+// Método para arrancar el Activity Indicator
+func startActivityIndicator(activity: UIActivityIndicatorView, view: UIView) {
+    
+    // Posicionar el Activity Indicator en el centro de la vista principal
+    activity.center = view.center
+    
+    // Ocultar cuando pare
+    activity.hidesWhenStopped = true
+    
+    // Arrancar la animación
+    activity.startAnimating()
+    
+    // Añadir el Activity Indicator a la vista
+    view.addSubview(activity)
+}
