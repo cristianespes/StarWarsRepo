@@ -10,7 +10,6 @@ import UIKit
 
 class ImageViewController: UIViewController, UIScrollViewDelegate {
     
-    
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet var image: UIImageView!
     var getImage : UIImageView!
@@ -26,11 +25,11 @@ class ImageViewController: UIViewController, UIScrollViewDelegate {
         // Título de la cabecera
         setTitleToHeader(episode: self.film.episode)
         
+        // Configuración del Zoom
         self.scrollView.minimumZoomScale = 1.0
         self.scrollView.maximumZoomScale = 3.0
-
-       //self.image = self.receivedImage
-        //self.image.image = self.getImage.image
+        
+        // Añadir imagen a la imageView
         self.image.image = self.film.image
     }
     
@@ -58,6 +57,7 @@ class ImageViewController: UIViewController, UIScrollViewDelegate {
             self.title = "Cover"
         }
     }
+    
     
     // MARK: - UIScrollViewDelegate
 

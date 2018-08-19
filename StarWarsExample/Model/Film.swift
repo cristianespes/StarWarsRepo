@@ -30,7 +30,7 @@ class Film {
         self.characters = characters
     }
     
-}
+} // End - class Film
 
 
 // MARK: - Get JSON from StarWars API
@@ -80,7 +80,7 @@ func getNumberOfObjects(nameResource: String, arrayFilms : [Film], completion: @
     // And finally send it
     task.resume()
     
-}
+} // End - getNumberOfObjects
 
 // ---------------------------------------------------------------------------------
 
@@ -172,4 +172,5 @@ func getArrayOfFilms(numberOfFilms : Int, completion: @escaping (Film?, Int?) ->
         // And finally send it
         task.resume()
     }
-}
+    
+} // End - getArrayOfFilms

@@ -39,7 +39,7 @@ class Person {
         self.skin_color = skin_color
         self.eye_color = eye_color
     }
-}
+} // End - class Person
 
 // MARK: - Get JSON from StarWars API
 
@@ -87,7 +87,7 @@ func getNumberOfObjects(nameResource: String, arrayPeople : [Person], completion
     // And finally send it
     task.resume()
     
-}
+} // End - getNumberOfObjects
 
 // ---------------------------------------------------------------------------------
 
@@ -164,7 +164,8 @@ func getArrayOfCharacters(numberOfCharacters : Int, completion: @escaping (Perso
         // And finally send it
         task.resume()
     }
-}
+    
+} // End - getArrayOfCharactersFromFilm(numberOfCharacters : Int
 
 
 // ---------------------------------------------------------------------------------
@@ -242,5 +243,6 @@ func getArrayOfCharactersFromFilm(film : Film, completion: @escaping (Person?, I
         // And finally send it
         task.resume()
     }
-}
+    
+} // End - getArrayOfCharactersFromFilm(film : Film
 

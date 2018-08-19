@@ -51,13 +51,6 @@ class FilmDetail: UIViewController {
         
     } // End - viewDidLoad
     
-    // Título barra de navegación cuando aparezca la pantalla
-    /*override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        // Título de la cabecera
-        self.navigationItem.title = self.film.title
-    }*/
-    
     // Ocultar menú superior
     override var prefersStatusBarHidden: Bool {
         return false
@@ -110,6 +103,7 @@ class FilmDetail: UIViewController {
     // MARK: - Segue
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
         if segue.identifier == "showCharacterDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow{
                 // Le pasamos el objeto
@@ -131,9 +125,11 @@ class FilmDetail: UIViewController {
                 destinationViewController.film = selectedFilm
             }
         }
-    }
+        
+    } // End - func prepare
     
-}
+} // End - class FilmDetail
+
 
 // Creamos una extensnión de la clase para aplicar los protocolos para la tableview
 extension FilmDetail : UITableViewDataSource, UITableViewDelegate {
@@ -141,10 +137,6 @@ extension FilmDetail : UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    
-    /*func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return Characters of films
-    }*/
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = UIView()
@@ -194,4 +186,4 @@ extension FilmDetail : UITableViewDataSource, UITableViewDelegate {
         return 65
     }
     
-}
+} // End - extension FilmDetail

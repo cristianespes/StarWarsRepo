@@ -46,7 +46,6 @@ class ViewController: UITableViewController {
         // Descargar datos de las películas de la API
         self.downloadFilmDataFromAPI()
         
-        
     } // End - viewDidLoad
     
     
@@ -122,8 +121,6 @@ class ViewController: UITableViewController {
         
     }
     
-
-    
     
     // MARK: - Downloading film data from API
     
@@ -141,7 +138,7 @@ class ViewController: UITableViewController {
         // Si hay acceso a Internet...
         
         // Iniciamos la animación de carga
-        startActivityIndicator(activity: self.activityIndicator, view: self.view)
+        startActivityIndicator(activityIndicator: self.activityIndicator, view: self.view, tableView: self.tableView)
         
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
@@ -239,6 +236,7 @@ class ViewController: UITableViewController {
         return cell
     }
     
+    
     // MARK: - UITableViewDelegate
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -281,7 +279,8 @@ class ViewController: UITableViewController {
         })
     }
 
-}
+} // End - class ViewController
+
 
 extension ViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
@@ -290,4 +289,4 @@ extension ViewController: UISearchResultsUpdating {
             self.tableView.reloadData()
         }
     }
-}
+} // End - extension ViewController

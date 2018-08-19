@@ -137,7 +137,7 @@ class CharacViewController: UITableViewController {
         // Si hay acceso a Internet...
         
         // Iniciamos la animación de carga
-        startActivityIndicator(activity: self.activityIndicator, view: self.view)
+        startActivityIndicator(activityIndicator: self.activityIndicator, view: self.view, tableView: self.tableView)
         
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
@@ -229,6 +229,7 @@ class CharacViewController: UITableViewController {
         return 65
     }
     
+    
     // MARK: - Segue
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -262,7 +263,7 @@ class CharacViewController: UITableViewController {
         })
     }
 
-}
+} // End - class CharacViewController
 
 extension CharacViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
@@ -271,4 +272,4 @@ extension CharacViewController: UISearchResultsUpdating {
             self.tableView.reloadData()
         }
     }
-}
+} // End - extension CharacViewController
