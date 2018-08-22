@@ -144,7 +144,7 @@ class ViewController: UITableViewController {
         DispatchQueue.global().async {
             
             // Realizamos el recuento de objetos para el recurso de films
-            getNumberOfObjects(nameResource: "films", arrayFilms : self.films) { getObject in
+            getNumberOfObjects(nameResource: "films", arrayObject : self.films) { getObject in
                 
                 // Si recibe el número de peliculas
                 guard let numberOfObjects = getObject else {

@@ -170,10 +170,11 @@ extension FilmDetail : UITableViewDataSource, UITableViewDelegate {
         let cellID = "CharacterCell"
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! CharacterCell
-        cell.thumbnailImageView.image = person.image
         cell.nameLabel.text = person.name
         cell.genderLabel.text = person.gender
         cell.birthLabel.text = person.birth_year
+        
+        cell.thumbnailImageView.getImgFromUrl(link: showCharacterFromUrl(characterName: person.name), placeholder: #imageLiteral(resourceName: "contactIcon"), index: Int(indexPath.row), completion: nil)
         
         cell.thumbnailImageView.layer.cornerRadius = 10.0
         cell.thumbnailImageView.clipsToBounds = true

@@ -16,7 +16,7 @@ class Film {
     let opening_crawl: String
     let release_date: String
     let episode: Int
-    let image : UIImage
+    var image : UIImage
     let url : Int
     let characters: [Int]
     
@@ -32,57 +32,9 @@ class Film {
     
 } // End - class Film
 
+// ---------------------------------------------------------------------------------
 
 // MARK: - Get JSON from StarWars API
-
-// ---------------------------------------------------------------------------------
-
-func getNumberOfObjects(nameResource: String, arrayFilms : [Film], completion: @escaping (Int?) -> Void ) {
-    
-    // let urlString = "https://swapi.co/api/people/?format=json&search=\(name)"
-    let urlString = "https://swapi.co/api/\(nameResource)/?format=json"
-    
-    // Check that the URL we’ve provided is valid
-    guard let urlRequest = URL(string: urlString) else {
-        print("Error: cannot create URL")
-        completion(nil)
-        return
-    }
-    
-    // Then we need a URLSession to use to send the request
-    let session = URLSession.shared
-    
-    // Then create the data task
-    let task = session.dataTask(with: urlRequest) { (data, _, error) in
-        // can't do print(response) since we don't have response
-        
-        // Check if any error exists
-        if let error = error {
-            print(error)
-            completion(nil)
-            return
-        }
-        
-        guard let datos = data else {return}
-        
-        DispatchQueue.main.async {
-            do {
-                let dataResource = try JSONDecoder().decode(Resource.self, from: datos)
-                //print(dataResource.count)
-                completion(dataResource.count)
-            } catch {
-                debugPrint(error)
-            }
-        }
-        
-    }
-    
-    // And finally send it
-    task.resume()
-    
-} // End - getNumberOfObjects
-
-// ---------------------------------------------------------------------------------
 
 func getArrayOfFilms(numberOfFilms : Int, completion: @escaping (Film?, Int?) -> Void ) {
     

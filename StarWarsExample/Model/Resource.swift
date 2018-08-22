@@ -43,6 +43,19 @@ func convertStringToInt(string: String) -> Int {
 
 // ---------------------------------------------------------------------------------
 
+func convertArrayIntToString(arrayOfInt: [Int]) -> [String] {
+    
+    var arrayOfString : [String] = []
+    
+    for value in arrayOfInt {
+        arrayOfString += ["\(value)"]
+    }
+    
+    return arrayOfString
+}
+
+// ---------------------------------------------------------------------------------
+
 // Método para mostrar alertas
 func showAlert(vc: UIViewController, message: String){
     let alert = UIAlertController(title: "Warning", message: message, preferredStyle: UIAlertControllerStyle.alert)
@@ -85,3 +98,103 @@ func startActivityIndicator(activityIndicator: UIActivityIndicatorView, view: UI
     // Añadir el Activity Indicator a la vista
     view.addSubview(activityIndicator)
 }
+
+// ---------------------------------------------------------------------------------
+// MARK: - Get JSON from StarWars API
+
+func getNumberOfObjects(nameResource: String, arrayObject : [AnyObject], completion: @escaping (Int?) -> Void ) {
+    
+    let urlString = "https://swapi.co/api/\(nameResource)/?format=json"
+    
+    // Check that the URL we’ve provided is valid
+    guard let urlRequest = URL(string: urlString) else {
+        print("Error: cannot create URL")
+        completion(nil)
+        return
+    }
+    
+    // Then we need a URLSession to use to send the request
+    let session = URLSession.shared
+    
+    // Then create the data task
+    let task = session.dataTask(with: urlRequest) { (data, _, error) in
+        // can't do print(response) since we don't have response
+        
+        // Check if any error exists
+        if let error = error {
+            print(error)
+            completion(nil)
+            return
+        }
+        
+        guard let datos = data else {return}
+        
+        DispatchQueue.main.async {
+            do {
+                let dataResource = try JSONDecoder().decode(Resource.self, from: datos)
+                //print(dataResource.count)
+                completion(dataResource.count)
+            } catch {
+                debugPrint(error)
+            }
+        }
+        
+    }
+    
+    // And finally send it
+    task.resume()
+    
+} // End - getNumberOfObjects
+
+// ---------------------------------------------------------------------------------
+// MARK: - Apply .uppercaseString to only the first letter of a string
+
+extension String {
+    func capitalizingFirstLetter() -> String {
+        return prefix(1).uppercased() + dropFirst()
+    }
+    
+    mutating func capitalizeFirstLetter() {
+        self = self.capitalizingFirstLetter()
+    }
+}
+
+// ---------------------------------------------------------------------------------
+
+// MARK: - Download image from URL
+
+extension UIImageView {
+    
+    // Método para descargar una Imagen dada una URL, hace falta añadir otra imagen en caso de fallo (placeholder)
+    func getImgFromUrl(link: String, placeholder: UIImage, index: Int,  completion: ((_ image: UIImage, _ index: Int) -> Void)? = nil ) {
+        
+        guard let url = NSURL(string: link) else { return }
+        
+        URLSession.shared.dataTask(with: url as URL, completionHandler: { (data, _, error) -> Void in
+            
+            // Check if any error exists
+            if error != nil {
+                DispatchQueue.main.async() { () -> Void in
+                    self.image = placeholder
+                }
+                return
+            }
+            
+            guard let image = UIImage(data: data!) else {
+                DispatchQueue.main.async() { () -> Void in
+                    self.image = placeholder
+                }
+                return
+            }
+            
+            DispatchQueue.main.async() { () -> Void in
+                self.image = image
+                completion?(image, index)
+            }
+            
+        }).resume()
+    }
+
+}
+
+

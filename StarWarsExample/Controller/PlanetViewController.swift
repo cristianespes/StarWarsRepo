@@ -1,18 +1,18 @@
 //
-//  CharacViewController.swift
+//  PlanetViewController.swift
 //  StarWarsExample
 //
-//  Created by CRISTIAN ESPES on 21/7/18.
+//  Created by CRISTIAN ESPES on 21/8/18.
 //  Copyright © 2018 CRISTIAN ESPES. All rights reserved.
 //
 
 import UIKit
 
-class CharacViewController: UITableViewController {
+class PlanetViewController: UITableViewController {
     
-    // Personajes del film
-    var people : [Person] = []
-    var searchResults : [Person] = []
+    // Planetas del film
+    var planets : [Planet] = []
+    var searchResults : [Planet] = []
     var searchController : UISearchController!
     
     lazy var refresher: UIRefreshControl = {
@@ -26,32 +26,24 @@ class CharacViewController: UITableViewController {
     
     // Crea el Activity Indicator
     let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.gray)
-    
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         // Aplicamos la configuración inicial en la vista
         self.viewInitialConfiguration()
         
         // Asignar el control de refresco la página
         if #available(iOS 10.0, *) {
             // >= iOS 10
-            tableView.refreshControl = self.refresher
+            self.tableView.refreshControl = self.refresher
         } else {
             // <= iOS 9 (Before iOS 10)
-            tableView.addSubview(self.refresher)
+            self.tableView.addSubview(self.refresher)
         }
         
         // Descargar datos de las películas de la API
-        self.downloadCharacterDataFromAPI()
-        
-        
-    } // End - viewDidLoad
-    
-    // Ocultar menú superior
-    override var prefersStatusBarHidden: Bool {
-        return false
+        self.downloadPlanetDataFromAPI()
     }
 
     override func didReceiveMemoryWarning() {
@@ -59,17 +51,16 @@ class CharacViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    
     // MARK: - Refresh data
     
     @objc func refreshData() {
         
         // Limpiamos la tableView
-        self.people.removeAll()
-        tableView.reloadData()
+        self.planets.removeAll()
+        self.tableView.reloadData()
         
         // Descargamos los datos de la API
-        self.downloadCharacterDataFromAPI()
+        self.downloadPlanetDataFromAPI()
         
         // Ocultamos la ruleta
         hideRefresher(refresher: refresher)
@@ -79,6 +70,10 @@ class CharacViewController: UITableViewController {
     // MARK: - Initial Configuration of the View
     
     func viewInitialConfiguration() {
+        
+        // Asignamos el delegado
+        //self.tableView.delegate = self
+        //self.tableView.dataSource = self
         
         // Asignamos título largo a la barra de navegación
         if #available(iOS 11.0, *) {
@@ -112,7 +107,7 @@ class CharacViewController: UITableViewController {
         // Controla el contenido que se difumina
         self.searchController.dimsBackgroundDuringPresentation = false
         // Texto de placeholder
-        self.searchController.searchBar.placeholder = "Find character..."
+        self.searchController.searchBar.placeholder = "Find planet..."
         // Color del texto "Cancelar"
         self.searchController.searchBar.tintColor = UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)
         // Mostrar la barra de navegacion durante la búsqueda
@@ -123,7 +118,7 @@ class CharacViewController: UITableViewController {
     
     // MARK: - Downloading character data from API
     
-    func downloadCharacterDataFromAPI() {
+    func downloadPlanetDataFromAPI() {
         
         // Comprobamos conexión a Internet para descargar los datos
         guard CheckInternet.isConnectedToNetwork() else {
@@ -142,8 +137,8 @@ class CharacViewController: UITableViewController {
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
             
-            // Realizamos el recuento de objetos para el recurso people de la API
-            getNumberOfObjects(nameResource: "people", arrayObject : self.people) { getObject in
+            // Realizamos el recuento de objetos para el recurso planets de la API
+            getNumberOfObjects(nameResource: "planets", arrayObject : self.planets) { getObject in
                 
                 // Si recibe el número de peliculas
                 guard let numberOfObjects = getObject else {
@@ -153,19 +148,19 @@ class CharacViewController: UITableViewController {
                 }
                 
                 // Ejecutamos la función para obtener el array con todos los personajes
-                getArrayOfCharacters(numberOfCharacters: numberOfObjects) { getCharacter, successCount in
+                getArrayOfPlanets(numberOfPlanets: numberOfObjects) { getPlanet, successCount in
                     
-                    guard let checkCharacter = getCharacter else { return }
-                        
-                        // Añadir nuevo personaje al array
-                        self.people += [checkCharacter]
-                        
-                        // Reordenamos el array de Personales por orden de episodios
-                        self.people.sort{ $0.name < $1.name}
+                    guard let checkPlanet = getPlanet else { return }
+                    
+                    // Añadir nuevo personaje al array
+                    self.planets += [checkPlanet]
+                    
+                    // Reordenamos el array de Personales por orden de episodios
+                    self.planets.sort{ $0.name < $1.name}
                     
                     guard let finalCount = successCount else { return }
                     
-                    if finalCount == self.people.count {
+                    if finalCount == self.planets.count {
                         // Enviamos al hilo principal las siguientes acciones
                         DispatchQueue.main.async {
                             
@@ -178,17 +173,17 @@ class CharacViewController: UITableViewController {
                         } // End - DispatchQueue
                     } // End - if
                     
-                } // End - getArrayOfCharacters
+                } // End - getArrayOfPlanets
                 
             } // End - getNumberOfObjects
             
         } // End - DispatchQueue.global().async
         
-    } // End - downloadCharacterDataFromAPI()
+    } // End - downloadPlanetDataFromAPI()
     
 
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -197,34 +192,36 @@ class CharacViewController: UITableViewController {
         if self.searchController.isActive {
             return self.searchResults.count
         } else {
-            return self.people.count
+            return self.planets.count
         }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let person : Person
+        
+        let planet : Planet
+        
         if self.searchController.isActive{
-            person = self.searchResults[indexPath.row]
+            planet = self.searchResults[indexPath.row]
         } else {
-            person = self.people[indexPath.row]
+            planet = self.planets[indexPath.row]
         }
         
-        let cellID = "Character2Cell"
+        let cellID = "PlanetCell"
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! CharacterCell
-        cell.nameLabel.text = person.name
-        cell.genderLabel.text = person.gender
-        cell.birthLabel.text = person.birth_year
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! PlanetCell
         
-        cell.thumbnailImageView.getImgFromUrl(link: showCharacterFromUrl(characterName: person.name), placeholder: #imageLiteral(resourceName: "contactIcon"), index: Int(indexPath.row)) { (image, index) in
-            self.people[index].image = image
+        cell.nameLabel.text = planet.name
+        
+        cell.planetImageView.getImgFromUrl(link: showPlanetFromUrl(planetName: planet.name), placeholder: #imageLiteral(resourceName: "planetIcon"), index: Int(indexPath.row)) { (image, index) in
+            self.planets[index].image = image
         }
         
-        cell.thumbnailImageView.layer.cornerRadius = 5.0
-        cell.thumbnailImageView.clipsToBounds = true
+        cell.planetImageView.layer.cornerRadius = 5.0
+        cell.planetImageView.clipsToBounds = true
         
         return cell
+        
     }
     
     // Función para retornar el tamaño de la celda
@@ -236,18 +233,18 @@ class CharacViewController: UITableViewController {
     // MARK: - Segue
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showCharDetail" {
+        if segue.identifier == "showPlanetDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow{
                 // Le pasamos el objeto
-                let selectedPerson : Person
+                let selectedPlanet : Planet
                 if self.searchController.isActive{
-                    selectedPerson = self.searchResults[indexPath.row]
+                    selectedPlanet = self.searchResults[indexPath.row]
                 } else {
-                    selectedPerson = self.people[indexPath.row]
+                    selectedPlanet = self.planets[indexPath.row]
                 }
                 //let selectedPerson = self.people[indexPath.row]
-                let destinationViewController = segue.destination as! CharacterDetail
-                destinationViewController.person = selectedPerson
+                let destinationViewController = segue.destination as! PlanetDetail
+                destinationViewController.planet = selectedPlanet
                 // Ocultar pestañas en la siguiente ventana
                 destinationViewController.hidesBottomBarWhenPushed = true
             }
@@ -258,21 +255,23 @@ class CharacViewController: UITableViewController {
         }
     }
     
+    
     // Método para filtrar en la búsqueda
     func filterContentFor(textToSearch: String) {
-        self.searchResults = self.people.filter({ (person) -> Bool in
+        self.searchResults = self.planets.filter({ (person) -> Bool in
             let personToFind = person.name.range(of: textToSearch, options: NSString.CompareOptions.caseInsensitive)
             return personToFind != nil
         })
     }
 
-} // End - class CharacViewController
+} // End - class PlanetViewController
 
-extension CharacViewController: UISearchResultsUpdating {
+
+extension PlanetViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         if let searchText = searchController.searchBar.text {
             self.filterContentFor(textToSearch: searchText)
             self.tableView.reloadData()
         }
     }
-} // End - extension CharacViewController
+} // End - extension PlanetsViewController
