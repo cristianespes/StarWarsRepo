@@ -189,7 +189,7 @@ class PlanetViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if self.searchController.isActive {
+        if self.searchController.isActive && !searchBarIsEmpty() {
             return self.searchResults.count
         } else {
             return self.planets.count
@@ -198,10 +198,9 @@ class PlanetViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        
         let planet : Planet
         
-        if self.searchController.isActive{
+        if self.searchController.isActive && !searchBarIsEmpty() {
             planet = self.searchResults[indexPath.row]
         } else {
             planet = self.planets[indexPath.row]
@@ -213,12 +212,18 @@ class PlanetViewController: UITableViewController {
         
         cell.nameLabel.text = planet.name
         
+        /*
         cell.planetImageView.getImgFromUrl(link: showPlanetFromUrl(planetName: planet.name), placeholder: #imageLiteral(resourceName: "planetIcon"), index: Int(indexPath.row)) { (image, index) in
             self.planets[index].image = image
-        }
+        }*/
+        
+        cell.planetImageView.image = planet.image
         
         cell.planetImageView.layer.cornerRadius = 5.0
         cell.planetImageView.clipsToBounds = true
+        
+        // Añadir felcha en el lado derecho
+        cell.accessoryType = .disclosureIndicator
         
         return cell
         
@@ -237,7 +242,11 @@ class PlanetViewController: UITableViewController {
             if let indexPath = self.tableView.indexPathForSelectedRow{
                 // Le pasamos el objeto
                 let selectedPlanet : Planet
-                if self.searchController.isActive{
+                if self.searchController.isActive {
+                    /*let cell = self.tableView.cellForRow(at: indexPath) as! PlanetCell
+                    if let image = cell.planetImageView.image {
+                        self.searchResults[indexPath.row].image = image
+                    }*/
                     selectedPlanet = self.searchResults[indexPath.row]
                 } else {
                     selectedPlanet = self.planets[indexPath.row]
@@ -258,9 +267,9 @@ class PlanetViewController: UITableViewController {
     
     // Método para filtrar en la búsqueda
     func filterContentFor(textToSearch: String) {
-        self.searchResults = self.planets.filter({ (person) -> Bool in
-            let personToFind = person.name.range(of: textToSearch, options: NSString.CompareOptions.caseInsensitive)
-            return personToFind != nil
+        self.searchResults = self.planets.filter({ (planet) -> Bool in
+            let planetToFind = planet.name.range(of: textToSearch, options: NSString.CompareOptions.caseInsensitive)
+            return planetToFind != nil
         })
     }
 
@@ -273,5 +282,10 @@ extension PlanetViewController: UISearchResultsUpdating {
             self.filterContentFor(textToSearch: searchText)
             self.tableView.reloadData()
         }
+    }
+    
+    func searchBarIsEmpty() -> Bool {
+        // Returns true if the text is empty or nil
+        return self.searchController.searchBar.text?.isEmpty ?? true
     }
 } // End - extension PlanetsViewController

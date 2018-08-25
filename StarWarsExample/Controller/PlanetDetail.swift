@@ -158,7 +158,9 @@ extension PlanetDetail: UITableViewDelegate, UITableViewDataSource {
         
         switch section {
         case 1:
-            title = "Residents"
+            if self.planet.residents.count > 0 {
+                title = "Residents"
+            }
         case 2:
             title = "Films"
         default:
@@ -167,31 +169,6 @@ extension PlanetDetail: UITableViewDelegate, UITableViewDataSource {
         
         return title
         
-    }
-    
-    func setTitleByFilm(film: Int) -> String {
-        switch film {
-        case 4:
-            return "Episode I"
-        case 5:
-            return "Episode II"
-        case 6:
-            return "Episode III"
-        case 1:
-            return "Episode IV"
-        case 2:
-            return "Episode V"
-        case 3:
-            return "Episode VI"
-        case 7:
-            return "Episode VII"
-        case 8:
-            return "Episode VIII"
-        case 9:
-            return "Episode IX"
-        default:
-            return ""
-        }
     }
     
 } // End - extension PlanetDetail

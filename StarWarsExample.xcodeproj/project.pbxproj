@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1922BB6A213195AA00C688FE /* StarshipDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1922BB69213195AA00C688FE /* StarshipDetail.swift */; };
+		1922BB6C213195C700C688FE /* StarshipDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1922BB6B213195C700C688FE /* StarshipDetailCell.swift */; };
+		19422D2221315F9100D345E7 /* Starship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19422D2121315F9100D345E7 /* Starship.swift */; };
+		19422D2421316D1A00D345E7 /* StarshipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19422D2321316D1A00D345E7 /* StarshipViewController.swift */; };
+		19422D26213172BC00D345E7 /* StarshipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19422D25213172BC00D345E7 /* StarshipCell.swift */; };
 		194F0AFB210323BD0015434D /* CharacterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194F0AFA210323BD0015434D /* CharacterCell.swift */; };
 		195E0794212578DD00E572BA /* ImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 195E0793212578DD00E572BA /* ImageViewController.swift */; };
 		1979B48A21241741006A2BC9 /* CheckInternet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1979B48921241741006A2BC9 /* CheckInternet.swift */; };
@@ -21,6 +26,7 @@
 		19A2F76420FD05C300BC209C /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A2F76320FD05C300BC209C /* Person.swift */; };
 		19CF1EBF21038FC600C7E45E /* CharacterDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19CF1EBE21038FC600C7E45E /* CharacterDetail.swift */; };
 		19D5F6E621027F9900ACB26E /* Resource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19D5F6E521027F9900ACB26E /* Resource.swift */; };
+		19F6F18321304B6300718E45 /* CharDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F6F18221304B6300718E45 /* CharDetailCell.swift */; };
 		19FB51FB212D457200B3B540 /* PlanetDetailCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19FB51FA212D457200B3B540 /* PlanetDetailCell.swift */; };
 		19FC44CE212C4C7C00BAC6E4 /* Planet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19FC44CD212C4C7C00BAC6E4 /* Planet.swift */; };
 		19FC44D0212C5ADB00BAC6E4 /* PlanetCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19FC44CF212C5ADB00BAC6E4 /* PlanetCell.swift */; };
@@ -30,6 +36,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1922BB69213195AA00C688FE /* StarshipDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarshipDetail.swift; sourceTree = "<group>"; };
+		1922BB6B213195C700C688FE /* StarshipDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarshipDetailCell.swift; sourceTree = "<group>"; };
+		19422D2121315F9100D345E7 /* Starship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Starship.swift; sourceTree = "<group>"; };
+		19422D2321316D1A00D345E7 /* StarshipViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarshipViewController.swift; sourceTree = "<group>"; };
+		19422D25213172BC00D345E7 /* StarshipCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarshipCell.swift; sourceTree = "<group>"; };
 		194F0AFA210323BD0015434D /* CharacterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterCell.swift; sourceTree = "<group>"; };
 		195E0793212578DD00E572BA /* ImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ImageViewController.swift; path = StarWarsExample/Controller/ImageViewController.swift; sourceTree = SOURCE_ROOT; };
 		1979B48921241741006A2BC9 /* CheckInternet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckInternet.swift; sourceTree = "<group>"; };
@@ -46,6 +57,7 @@
 		19A2F76320FD05C300BC209C /* Person.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Person.swift; path = StarWarsExample/Model/Person.swift; sourceTree = SOURCE_ROOT; };
 		19CF1EBE21038FC600C7E45E /* CharacterDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetail.swift; sourceTree = "<group>"; };
 		19D5F6E521027F9900ACB26E /* Resource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Resource.swift; path = StarWarsExample/Model/Resource.swift; sourceTree = SOURCE_ROOT; };
+		19F6F18221304B6300718E45 /* CharDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharDetailCell.swift; sourceTree = "<group>"; };
 		19FB51FA212D457200B3B540 /* PlanetDetailCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanetDetailCell.swift; sourceTree = "<group>"; };
 		19FC44CD212C4C7C00BAC6E4 /* Planet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Planet.swift; sourceTree = "<group>"; };
 		19FC44CF212C5ADB00BAC6E4 /* PlanetCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanetCell.swift; sourceTree = "<group>"; };
@@ -111,6 +123,7 @@
 				19A2F76320FD05C300BC209C /* Person.swift */,
 				197E965821022969002FF94C /* Film.swift */,
 				19FC44CD212C4C7C00BAC6E4 /* Planet.swift */,
+				19422D2121315F9100D345E7 /* Starship.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -125,10 +138,15 @@
 				19FD8E922103839D005C3B92 /* CharacViewController.swift */,
 				194F0AFA210323BD0015434D /* CharacterCell.swift */,
 				19CF1EBE21038FC600C7E45E /* CharacterDetail.swift */,
+				19F6F18221304B6300718E45 /* CharDetailCell.swift */,
 				19FC44D1212C8D2100BAC6E4 /* PlanetViewController.swift */,
 				19FC44CF212C5ADB00BAC6E4 /* PlanetCell.swift */,
 				19FC44D5212CC6E600BAC6E4 /* PlanetDetail.swift */,
 				19FB51FA212D457200B3B540 /* PlanetDetailCell.swift */,
+				19422D2321316D1A00D345E7 /* StarshipViewController.swift */,
+				19422D25213172BC00D345E7 /* StarshipCell.swift */,
+				1922BB69213195AA00C688FE /* StarshipDetail.swift */,
+				1922BB6B213195C700C688FE /* StarshipDetailCell.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -204,21 +222,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				19422D2221315F9100D345E7 /* Starship.swift in Sources */,
 				19D5F6E621027F9900ACB26E /* Resource.swift in Sources */,
 				197E965D210244DF002FF94C /* FilmCell.swift in Sources */,
 				19CF1EBF21038FC600C7E45E /* CharacterDetail.swift in Sources */,
+				19422D2421316D1A00D345E7 /* StarshipViewController.swift in Sources */,
 				197E965921022969002FF94C /* Film.swift in Sources */,
 				19FC44D6212CC6E600BAC6E4 /* PlanetDetail.swift in Sources */,
 				19FB51FB212D457200B3B540 /* PlanetDetailCell.swift in Sources */,
+				19422D26213172BC00D345E7 /* StarshipCell.swift in Sources */,
+				19F6F18321304B6300718E45 /* CharDetailCell.swift in Sources */,
 				194F0AFB210323BD0015434D /* CharacterCell.swift in Sources */,
 				19FC44D0212C5ADB00BAC6E4 /* PlanetCell.swift in Sources */,
 				19FD8E932103839D005C3B92 /* CharacViewController.swift in Sources */,
 				19FC44D2212C8D2100BAC6E4 /* PlanetViewController.swift in Sources */,
 				1979B48A21241741006A2BC9 /* CheckInternet.swift in Sources */,
 				19A2F76420FD05C300BC209C /* Person.swift in Sources */,
+				1922BB6A213195AA00C688FE /* StarshipDetail.swift in Sources */,
 				19A2F75120FD04E300BC209C /* ViewController.swift in Sources */,
 				197E965F210255D8002FF94C /* FilmDetail.swift in Sources */,
 				19FC44CE212C4C7C00BAC6E4 /* Planet.swift in Sources */,
+				1922BB6C213195C700C688FE /* StarshipDetailCell.swift in Sources */,
 				195E0794212578DD00E572BA /* ImageViewController.swift in Sources */,
 				19A2F74F20FD04E300BC209C /* AppDelegate.swift in Sources */,
 			);

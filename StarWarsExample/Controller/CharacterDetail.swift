@@ -10,16 +10,11 @@ import UIKit
 
 class CharacterDetail: UIViewController {
     
-    // Contenido del film
+    // Contenido del personaje
     @IBOutlet var characterImageView: UIImageView!
-    @IBOutlet var nameText: UILabel!
-    @IBOutlet var genderText: UILabel!
-    @IBOutlet var birthText: UILabel!
-    @IBOutlet var heightText: UILabel!
-    @IBOutlet var massText: UILabel!
-    @IBOutlet var hairText: UILabel!
-    @IBOutlet var skinText: UILabel!
-    @IBOutlet var eyeText: UILabel!
+    @IBOutlet weak var tableView: UITableView!
+    
+    var homeworld = "-"
     
     var person : Person!
 
@@ -30,23 +25,20 @@ class CharacterDetail: UIViewController {
         
         // Actualizamos los objetos de la vista
         self.characterImageView.image = self.person.image
-        self.nameText.text = self.person.name
-        self.genderText.text = self.person.gender
-        self.birthText.text = self.person.birth_year
-        self.heightText.text = self.person.height
-        self.massText.text = self.person.mass
-        self.hairText.text = self.person.hair_color
-        self.skinText.text = self.person.skin_color
-        self.eyeText.text = self.person.eye_color
         
         // Título de la cabecera
         self.title = self.person.name
         
+        // Asingación del delegado
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
         
         // Anulamos el título largo de la cabecera en esta pantalla
         if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never
         }
+        
+        downloadPlanetDataOfTheCharacterFromAPI()
         
     } // End - viewDidLoad
     
@@ -59,5 +51,119 @@ class CharacterDetail: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+    
+    // MARK: - Downloading character data of the film from API
+    
+    func downloadPlanetDataOfTheCharacterFromAPI() {
+        
+        // Ejecutamos en segundo plano la descarga de los datos desde la API
+        DispatchQueue.global().async {
+            
+            // Ejecutamos la función para obtener el array con todos los personaje
+            getPlanetByID(value: convertStringToInt(string: self.person.homeworld))
+            { getPlanet, successCount in
+                
+                guard let checkPlanet = getPlanet else { return }
+                
+                // Añadir nuevo personaje al array    
+                self.homeworld = checkPlanet.name
+                
+                // Enviamos al hilo principal las siguientes acciones
+                DispatchQueue.main.async {
+                    
+                    // Recargar la tableView en el hilo principal
+                    self.tableView.reloadData()
+                    
+                } // End - DispatchQueue
+                
+            } // End - getArrayOfCharactersFromFilm
+            
+        } // End - DispatchQueue.global().async
+        
+    } // End - downloadPlanetDataOfTheCharacterFromAPI()
 
 } // End - class CharacterDetail
+
+
+extension CharacterDetail: UITableViewDelegate, UITableViewDataSource {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 3
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        switch section {
+        case 0:
+            return 8
+        case 1:
+            return self.person.films.count
+        default:
+            return 0
+        }
+        
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CharDetailCell", for: indexPath) as! CharDetailCell
+        
+        switch indexPath.section {
+        case 0:
+            switch indexPath.row {
+            case 0:
+                cell.keyLabel.text = "Gender"
+                cell.valueLabel.text = self.person.gender
+            case 1:
+                cell.keyLabel.text = "Year of Birth"
+                cell.valueLabel.text = self.person.birth_year
+            case 2:
+                cell.keyLabel.text = "Height"
+                cell.valueLabel.text = self.person.height
+            case 3:
+                cell.keyLabel.text = "Mass"
+                cell.valueLabel.text = self.person.mass
+            case 4:
+                cell.keyLabel.text = "Hair Color"
+                cell.valueLabel.text = self.person.hair_color
+            case 5:
+                cell.keyLabel.text = "Skin Color"
+                cell.valueLabel.text = self.person.skin_color
+            case 6:
+                cell.keyLabel.text = "Eye Color"
+                cell.valueLabel.text = self.person.eye_color
+            case 7:
+                cell.keyLabel.text = "Homeworld"
+                cell.valueLabel.text = self.homeworld
+            default:
+                break
+            }
+         
+        case 1:
+            cell.keyLabel.text = ""
+            cell.valueLabel.text = setTitleByFilm(film: self.person.films[indexPath.row])
+ 
+        default:
+            break
+        }
+        
+        return cell
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        
+        var title = ""
+        
+        switch section {
+        case 1:
+            title = "Films"
+        default:
+            break
+        }
+        
+        return title
+        
+    }
+    
+} // End - Extension CharacterDetail

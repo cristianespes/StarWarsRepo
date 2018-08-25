@@ -1,24 +1,24 @@
 //
-//  ViewController.swift
+//  StarshipViewController.swift
 //  StarWarsExample
 //
-//  Created by CRISTIAN ESPES on 20/7/18.
+//  Created by CRISTIAN ESPES on 25/8/18.
 //  Copyright © 2018 CRISTIAN ESPES. All rights reserved.
 //
 
 import UIKit
 
-class ViewController: UITableViewController {
-    
-    var films : [Film] = []
-    var searchResults : [Film] = []
+class StarshipViewController: UITableViewController {
+
+    // Planetas del film
+    var starships : [Starship] = []
+    var searchResults : [Starship] = []
     var searchController : UISearchController!
-    
     
     lazy var refresher: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.tintColor = UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)
-        //refreshControl.attributedTitle = NSAttributedString(string: "Updating Films...", attributes: [NSAttributedStringKey.foregroundColor: UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)])
+        //refreshControl.attributedTitle = NSAttributedString(string: "Updating Characters...", attributes: [NSAttributedStringKey.foregroundColor: UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)])
         refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
         
         return refreshControl
@@ -26,7 +26,6 @@ class ViewController: UITableViewController {
     
     // Crea el Activity Indicator
     let activityIndicator = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.gray)
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,45 +36,36 @@ class ViewController: UITableViewController {
         // Asignar el control de refresco la página
         if #available(iOS 10.0, *) {
             // >= iOS 10
-            tableView.refreshControl = self.refresher
+            self.tableView.refreshControl = self.refresher
         } else {
             // <= iOS 9 (Before iOS 10)
-            tableView.addSubview(self.refresher)
+            self.tableView.addSubview(self.refresher)
         }
         
         // Descargar datos de las películas de la API
-        self.downloadFilmDataFromAPI()
-        
-    } // End - viewDidLoad
-    
-    
-    // Ocultar menú superior
-    func prefersStatusBarHidden() -> Bool {
-        return false
+        self.downloadStarshipDataFromAPI()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
     
     // MARK: - Refresh data
     
     @objc func refreshData() {
         
         // Limpiamos la tableView
-        self.films.removeAll()
-        tableView.reloadData()
+        self.starships.removeAll()
+        self.tableView.reloadData()
         
         // Descargamos los datos de la API
-        self.downloadFilmDataFromAPI()
+        self.downloadStarshipDataFromAPI()
         
         // Ocultamos la ruleta
         hideRefresher(refresher: refresher)
         
     }
-    
     
     // MARK: - Initial Configuration of the View
     
@@ -113,7 +103,7 @@ class ViewController: UITableViewController {
         // Controla el contenido que se difumina
         self.searchController.dimsBackgroundDuringPresentation = false
         // Texto de placeholder
-        self.searchController.searchBar.placeholder = "Find film..."
+        self.searchController.searchBar.placeholder = "Find starship..."
         // Color del texto "Cancelar"
         self.searchController.searchBar.tintColor = UIColor(red: 244.0/255.0, green: 196.0/255.0, blue: 48.0/255.0, alpha: 1.0)
         // Mostrar la barra de navegacion durante la búsqueda
@@ -122,9 +112,9 @@ class ViewController: UITableViewController {
     }
     
     
-    // MARK: - Downloading film data from API
+    // MARK: - Downloading character data from API
     
-    func downloadFilmDataFromAPI() {
+    func downloadStarshipDataFromAPI() {
         
         // Comprobamos conexión a Internet para descargar los datos
         guard CheckInternet.isConnectedToNetwork() else {
@@ -143,8 +133,8 @@ class ViewController: UITableViewController {
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
             
-            // Realizamos el recuento de objetos para el recurso de films
-            getNumberOfObjects(nameResource: "films", arrayObject : self.films) { getObject in
+            // Realizamos el recuento de objetos para el recurso planets de la API
+            getNumberOfObjects(nameResource: "starships", arrayObject : self.starships) { getObject in
                 
                 // Si recibe el número de peliculas
                 guard let numberOfObjects = getObject else {
@@ -153,23 +143,20 @@ class ViewController: UITableViewController {
                     return
                 }
                 
-                getArrayOfFilms(numberOfFilms: numberOfObjects, completion: {
-                    getFilm, successCount  in
-                    if let checkFilm = getFilm {
-                            
-                            // Añadir nueva película al array
-                            self.films += [checkFilm]
-                            
-                            // Reordenamos el array de Películas por orden de episodios
-                            self.films.sort{ $0.episode < $1.episode}
-                        
-                    } // End - if
+                // Ejecutamos la función para obtener el array con todos los personajes
+                getArrayOfStarships(numberOfStarships: numberOfObjects) { getStarship, successCount in
                     
-                    guard let count = successCount else { return }
+                    guard let checkStarship = getStarship else { return }
                     
-                    // Cuando se haya completado el array con todos los objetos
-                    if count == self.films.count {
-                        
+                    // Añadir nuevo personaje al array
+                    self.starships += [checkStarship]
+                    
+                    // Reordenamos el array de Personales por orden de episodios
+                    self.starships.sort{ $0.name < $1.name}
+                    
+                    guard let finalCount = successCount else { return }
+                    
+                    if finalCount == self.starships.count {
                         // Enviamos al hilo principal las siguientes acciones
                         DispatchQueue.main.async {
                             
@@ -179,24 +166,20 @@ class ViewController: UITableViewController {
                             // Recargar la tableView en el hilo principal
                             self.tableView.reloadData()
                             
-                        } // End - DispatchQueue.main.async
-                        
+                        } // End - DispatchQueue
                     } // End - if
                     
-                    
-                }) // End - getArrayOfFilms
-                
+                } // End - getArrayOfPlanets
                 
             } // End - getNumberOfObjects
             
         } // End - DispatchQueue.global().async
         
-    } // End - downloadFilmDataFromAPI()
+    } // End - downloadStarshipDataFromAPI()
     
     
-    
-    // MARK: - UITableViewDataSource
-    
+    // MARK: - Table view data source
+
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -205,63 +188,58 @@ class ViewController: UITableViewController {
         if self.searchController.isActive && !searchBarIsEmpty() {
             return self.searchResults.count
         } else {
-            return self.films.count
+            return self.starships.count
         }
-    }
-    
-    // Función para retornar el tamaño de la celda
-    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 200
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let film : Film
+        
+        let starship : Starship
+        
         if self.searchController.isActive && !searchBarIsEmpty() {
-            film = self.searchResults[indexPath.row]
+            starship = self.searchResults[indexPath.row]
         } else {
-            film = self.films[indexPath.row]
+            starship = self.starships[indexPath.row]
         }
         
-        let cellID = "filmCell"
+        let cell = tableView.dequeueReusableCell(withIdentifier: "StarshipCell", for: indexPath) as! StarshipCell
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! FilmCell
-        cell.thumbnailImageView.image = film.image
-        cell.titleLabel.text = film.title
-        cell.descriptionLabel.text = film.opening_crawl
-        cell.releaseYearLabel.text = "Premiere: " + film.release_date
+        cell.nameLabel.text = starship.name
         
-        cell.thumbnailImageView.layer.cornerRadius = 10.0
+        cell.thumbnailImageView.image = starship.image
+        
+        cell.thumbnailImageView.layer.cornerRadius = 5.0
         cell.thumbnailImageView.clipsToBounds = true
         
         // Añadir felcha en el lado derecho
         cell.accessoryType = .disclosureIndicator
         
         return cell
+        
     }
     
-    
-    // MARK: - UITableViewDelegate
-    
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //print("He seleccionado la fila \(indexPath.row)")
+    // Función para retornar el tamaño de la celda
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 65
     }
+    
     
     // MARK: - Segue
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "showFilmDetail" {
+        if segue.identifier == "showStarshipDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow{
+                
                 // Le pasamos el objeto
-                let selectedFilm : Film
-                if self.searchController.isActive{
-                    selectedFilm = self.searchResults[indexPath.row]
+                let selectedStarship : Starship
+                if self.searchController.isActive {
+                    selectedStarship = self.searchResults[indexPath.row]
                 } else {
-                    selectedFilm = self.films[indexPath.row]
+                    selectedStarship = self.starships[indexPath.row]
                 }
                 
-                //let selectedFilm = self.films[indexPath.row]
-                let destinationViewController = segue.destination as! FilmDetail
-                destinationViewController.film = selectedFilm
+                let destinationViewController = segue.destination as! StarshipDetail
+                destinationViewController.starship = selectedStarship
                 // Ocultar pestañas en la siguiente ventana
                 destinationViewController.hidesBottomBarWhenPushed = true
             }
@@ -272,20 +250,19 @@ class ViewController: UITableViewController {
         }
     }
     
-    // MARK: - Search Bar
     
     // Método para filtrar en la búsqueda
     func filterContentFor(textToSearch: String) {
-        self.searchResults = self.films.filter({ (film) -> Bool in
-            let titleToFind = film.title.range(of: textToSearch, options: NSString.CompareOptions.caseInsensitive)
-            return titleToFind != nil
+        self.searchResults = self.starships.filter({ (starship) -> Bool in
+            let starshipToFind = starship.name.range(of: textToSearch, options: NSString.CompareOptions.caseInsensitive)
+            return starshipToFind != nil
         })
     }
 
-} // End - class ViewController
+} // End - class StarshipViewController
 
 
-extension ViewController: UISearchResultsUpdating {
+extension StarshipViewController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         if let searchText = searchController.searchBar.text {
             self.filterContentFor(textToSearch: searchText)
@@ -297,4 +274,4 @@ extension ViewController: UISearchResultsUpdating {
         // Returns true if the text is empty or nil
         return self.searchController.searchBar.text?.isEmpty ?? true
     }
-} // End - extension ViewController
+} // End - extension StarshipViewController

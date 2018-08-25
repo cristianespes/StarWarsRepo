@@ -197,4 +197,31 @@ extension UIImageView {
 
 }
 
+// ---------------------------------------------------------------------------------
 
+// MARK: - Devolver episodio según la película
+
+func setTitleByFilm(film: Int) -> String {
+    switch film {
+    case 4:
+        return "Episode I"
+    case 5:
+        return "Episode II"
+    case 6:
+        return "Episode III"
+    case 1:
+        return "Episode IV"
+    case 2:
+        return "Episode V"
+    case 3:
+        return "Episode VI"
+    case 7:
+        return "Episode VII"
+    case 8:
+        return "Episode VIII"
+    case 9:
+        return "Episode IX"
+    default:
+        return ""
+    }
+}

@@ -194,7 +194,7 @@ class CharacViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if self.searchController.isActive {
+        if self.searchController.isActive && !searchBarIsEmpty() {
             return self.searchResults.count
         } else {
             return self.people.count
@@ -203,8 +203,9 @@ class CharacViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let person : Person
-        if self.searchController.isActive{
+        let person : Person!
+        
+        if self.searchController.isActive && !searchBarIsEmpty() {
             person = self.searchResults[indexPath.row]
         } else {
             person = self.people[indexPath.row]
@@ -217,12 +218,17 @@ class CharacViewController: UITableViewController {
         cell.genderLabel.text = person.gender
         cell.birthLabel.text = person.birth_year
         
+        /*
         cell.thumbnailImageView.getImgFromUrl(link: showCharacterFromUrl(characterName: person.name), placeholder: #imageLiteral(resourceName: "contactIcon"), index: Int(indexPath.row)) { (image, index) in
             self.people[index].image = image
-        }
+        }*/
+        cell.thumbnailImageView.image = person.image
         
         cell.thumbnailImageView.layer.cornerRadius = 5.0
         cell.thumbnailImageView.clipsToBounds = true
+        
+        // Añadir felcha en el lado derecho
+        cell.accessoryType = .disclosureIndicator
         
         return cell
     }
@@ -241,11 +247,14 @@ class CharacViewController: UITableViewController {
                 // Le pasamos el objeto
                 let selectedPerson : Person
                 if self.searchController.isActive{
+                    /*let cell = self.tableView.cellForRow(at: indexPath) as! CharacterCell
+                    if let image = cell.thumbnailImageView.image {
+                        self.searchResults[indexPath.row].image = image
+                    }*/
                     selectedPerson = self.searchResults[indexPath.row]
                 } else {
                     selectedPerson = self.people[indexPath.row]
                 }
-                //let selectedPerson = self.people[indexPath.row]
                 let destinationViewController = segue.destination as! CharacterDetail
                 destinationViewController.person = selectedPerson
                 // Ocultar pestañas en la siguiente ventana
@@ -274,5 +283,10 @@ extension CharacViewController: UISearchResultsUpdating {
             self.filterContentFor(textToSearch: searchText)
             self.tableView.reloadData()
         }
+    }
+    
+    func searchBarIsEmpty() -> Bool {
+        // Returns true if the text is empty or nil
+        return self.searchController.searchBar.text?.isEmpty ?? true
     }
 } // End - extension CharacViewController

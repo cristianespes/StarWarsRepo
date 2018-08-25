@@ -19,19 +19,18 @@ class Person {
     let hair_color : String
     let skin_color : String
     let eye_color : String
-    /*let homeworld : String
-    let species : [String]
-    let vehicles : [String]
-    let starships : [String]
-    let url : String*/
+    let homeworld : String
+    let vehicles : [Int]
+    let starships : [Int]
+    let species : [Int]
+    /*let url : String*/
     var image : UIImage
     var films : [Int]
     
-    init(name: String, birth_year: String, gender: String, films: [Int], image: UIImage, height : String, mass : String, hair_color : String, skin_color : String, eye_color : String) {
+    init(name: String, birth_year: String, gender: String, films: [Int], image: UIImage, height : String, mass : String, hair_color : String, skin_color : String, eye_color : String, homeworld: String, vehicles: [Int], starships: [Int], species: [Int]) {
         self.name = name
         self.birth_year = birth_year
         self.gender = gender
-        
         self.image = image
         self.films = films
         self.height = height
@@ -39,6 +38,10 @@ class Person {
         self.hair_color = hair_color
         self.skin_color = skin_color
         self.eye_color = eye_color
+        self.homeworld = homeworld
+        self.vehicles = vehicles
+        self.starships = starships
+        self.species = species
     }
 } // End - class Person
 
@@ -47,9 +50,11 @@ class Person {
 
 func getArrayOfCharacters(numberOfCharacters : Int, completion: @escaping (Person?, Int?) -> Void ) {
     
-    var successCount = numberOfCharacters
+    // La API no devuelve el número total de Starships, hay que meterlo a mano
+    var successCount = 88// numberOfCharacters
+    let totalOfCharacters = 88 // numberOfCharacters
     
-    for value in 1...numberOfCharacters {
+    for value in 1...totalOfCharacters {
         
         let urlString = "https://swapi.co/api/people/\(value)/?format=json"
         
@@ -92,23 +97,50 @@ func getArrayOfCharacters(numberOfCharacters : Int, completion: @escaping (Perso
                 
                 // Obtenemos los valores del diccionario
                 let name = dataPerson["name"] as! String
-                let gender = (dataPerson["gender"] as! String) == "none" || (dataPerson["gender"] as! String) == "n/a" ? "-" : dataPerson["gender"] as! String
+                let gender = (dataPerson["gender"] as! String) == "none" || (dataPerson["gender"] as! String) == "n/a" ? "-" : (dataPerson["gender"] as! String).capitalizingFirstLetter()
                 let birth_year = (dataPerson["birth_year"] as! String) == "unknown" ? "-" : dataPerson["birth_year"] as! String
                 let height = (dataPerson["height"] as! String) == "unknown" ? "-" : dataPerson["height"] as! String
                 let mass = (dataPerson["mass"] as! String) == "unknown" ? "-" : dataPerson["mass"] as! String
-                let hair_color = (dataPerson["hair_color"] as! String) == "n/a" || (dataPerson["hair_color"] as! String) == "none" || (dataPerson["hair_color"] as! String) == "unknown" ? "-" : dataPerson["hair_color"] as! String
-                let skin_color = (dataPerson["skin_color"] as! String) == "none" || (dataPerson["skin_color"] as! String) == "unknown" ? "-" : dataPerson["skin_color"] as! String
-                let eye_color = dataPerson["eye_color"] as! String == "unknown" || (dataPerson["eye_color"] as! String) == "none" ? "-" : dataPerson["eye_color"] as! String
+                let hair_color = (dataPerson["hair_color"] as! String) == "n/a" || (dataPerson["hair_color"] as! String) == "none" || (dataPerson["hair_color"] as! String) == "unknown" ? "-" : (dataPerson["hair_color"] as! String).capitalizingFirstLetter()
+                let skin_color = (dataPerson["skin_color"] as! String) == "none" || (dataPerson["skin_color"] as! String) == "unknown" ? "-" : (dataPerson["skin_color"] as! String).capitalizingFirstLetter()
+                let eye_color = dataPerson["eye_color"] as! String == "unknown" || (dataPerson["eye_color"] as! String) == "none" ? "-" : (dataPerson["eye_color"] as! String).capitalizingFirstLetter()
+                let homeworld = dataPerson["homeworld"] as! String == "unknown" || (dataPerson["homeworld"] as! String) == "none" ? "-" : (dataPerson["homeworld"] as! String).capitalizingFirstLetter()
                 
                 // Descarga la imagen desde Internet
-                let image = #imageLiteral(resourceName: "contactIcon")
+                var image = #imageLiteral(resourceName: "contactIcon") // Imagen por defecto
+                if let url = URL(string: showCharacterFromUrl(characterName: name)) {
+                    do {
+                        let data = try Data(contentsOf: url)
+                        guard let downloadImage = UIImage(data: data) else { return }
+                        image = downloadImage
+                        
+                    } catch let error {
+                        print("Error al descargar la imagen de \(name): \(error.localizedDescription)")
+                    }
+                }
                 
                 // Extraemos el array de films de cada personaje y lo convertimos a Int
                 let extractedFilms = dataPerson["films"] as! [String]
-                let films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
+                var films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
+                films.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedVehicles = dataPerson["vehicles"] as! [String]
+                var vehicles : [Int] = convertArrayStringToInt(arrayOfString: extractedVehicles)
+                vehicles.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedStarships = dataPerson["starships"] as! [String]
+                var starships : [Int] = convertArrayStringToInt(arrayOfString: extractedStarships)
+                starships.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedSpecies = dataPerson["species"] as! [String]
+                var species : [Int] = convertArrayStringToInt(arrayOfString: extractedSpecies)
+                species.sort{ $0 < $1 }
                 
                 // Almacenamos los valores obtenidos en una instancia de Planet
-                let person = Person(name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color)
+                let person = Person(name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color, homeworld:  homeworld, vehicles: vehicles, starships: starships, species: species)
                 
                 completion(person, successCount)
             } catch {
@@ -173,24 +205,50 @@ func getArrayOfCharactersFromFilm(film : Film, completion: @escaping (Person?, I
                 
                 // Obtenemos los valores del diccionario
                 let name = dataPerson["name"] as! String
-                let gender = (dataPerson["gender"] as! String) == "none" || (dataPerson["gender"] as! String) == "n/a" ? "-" : dataPerson["gender"] as! String
+                let gender = (dataPerson["gender"] as! String) == "none" || (dataPerson["gender"] as! String) == "n/a" ? "-" : (dataPerson["gender"] as! String).capitalizingFirstLetter()
                 let birth_year = (dataPerson["birth_year"] as! String) == "unknown" ? "-" : dataPerson["birth_year"] as! String
                 let height = (dataPerson["height"] as! String) == "unknown" ? "-" : dataPerson["height"] as! String
                 let mass = (dataPerson["mass"] as! String) == "unknown" ? "-" : dataPerson["mass"] as! String
-                let hair_color = (dataPerson["hair_color"] as! String) == "n/a" || (dataPerson["hair_color"] as! String) == "none" || (dataPerson["hair_color"] as! String) == "unknown" ? "-" : dataPerson["hair_color"] as! String
-                let skin_color = (dataPerson["skin_color"] as! String) == "none" || (dataPerson["skin_color"] as! String) == "unknown" ? "-" : dataPerson["skin_color"] as! String
-                let eye_color = dataPerson["eye_color"] as! String == "unknown" || (dataPerson["eye_color"] as! String) == "none" ? "-" : dataPerson["eye_color"] as! String
+                let hair_color = (dataPerson["hair_color"] as! String) == "n/a" || (dataPerson["hair_color"] as! String) == "none" || (dataPerson["hair_color"] as! String) == "unknown" ? "-" : (dataPerson["hair_color"] as! String).capitalizingFirstLetter()
+                let skin_color = (dataPerson["skin_color"] as! String) == "none" || (dataPerson["skin_color"] as! String) == "unknown" ? "-" : (dataPerson["skin_color"] as! String).capitalizingFirstLetter()
+                let eye_color = dataPerson["eye_color"] as! String == "unknown" || (dataPerson["eye_color"] as! String) == "none" ? "-" : (dataPerson["eye_color"] as! String).capitalizingFirstLetter()
+                let homeworld = dataPerson["homeworld"] as! String == "unknown" || (dataPerson["homeworld"] as! String) == "none" ? "-" : (dataPerson["homeworld"] as! String).capitalizingFirstLetter()
                 
                 // Descarga la imagen desde Internet
-                //let image = showCharacterFromUrl(characterName: name) ?? #imageLiteral(resourceName: "contactIcon")
-                let image = #imageLiteral(resourceName: "contactIcon")
+                var image = #imageLiteral(resourceName: "contactIcon") // Imagen por defecto
+                if let url = URL(string: showCharacterFromUrl(characterName: name)) {
+                    do {
+                        let data = try Data(contentsOf: url)
+                        guard let downloadImage = UIImage(data: data) else { return }
+                        image = downloadImage
+                        
+                    } catch let error {
+                        print("Error al descargar la imagen de \(name): \(error.localizedDescription)")
+                    }
+                }
                 
                 // Extraemos el array de films de cada personaje y lo convertimos a Int
                 let extractedFilms = dataPerson["films"] as! [String]
-                let films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
+                var films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
+                films.sort{ $0 < $1 }
                 
-                // Almacenamos los valores obtenidos en una instancia de Film
-                let person = Person(name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color)
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedVehicles = dataPerson["vehicles"] as! [String]
+                var vehicles : [Int] = convertArrayStringToInt(arrayOfString: extractedVehicles)
+                vehicles.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedStarships = dataPerson["starships"] as! [String]
+                var starships : [Int] = convertArrayStringToInt(arrayOfString: extractedStarships)
+                starships.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedSpecies = dataPerson["species"] as! [String]
+                var species : [Int] = convertArrayStringToInt(arrayOfString: extractedSpecies)
+                species.sort{ $0 < $1 }
+                
+                // Almacenamos los valores obtenidos en una instancia de Planet
+                let person = Person(name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color, homeworld:  homeworld, vehicles: vehicles, starships: starships, species: species)
                 
                 completion(person, successCount)
             } catch {
@@ -262,17 +320,151 @@ func getArrayOfCharactersFromPlanet(planet : Planet, completion: @escaping (Pers
                 let hair_color = (dataPerson["hair_color"] as! String) == "n/a" || (dataPerson["hair_color"] as! String) == "none" || (dataPerson["hair_color"] as! String) == "unknown" ? "-" : (dataPerson["hair_color"] as! String).capitalizingFirstLetter()
                 let skin_color = (dataPerson["skin_color"] as! String) == "none" || (dataPerson["skin_color"] as! String) == "unknown" ? "-" : (dataPerson["skin_color"] as! String).capitalizingFirstLetter()
                 let eye_color = dataPerson["eye_color"] as! String == "unknown" || (dataPerson["eye_color"] as! String) == "none" ? "-" : (dataPerson["eye_color"] as! String).capitalizingFirstLetter()
+                let homeworld = dataPerson["homeworld"] as! String == "unknown" || (dataPerson["homeworld"] as! String) == "none" ? "-" : (dataPerson["homeworld"] as! String).capitalizingFirstLetter()
                 
                 // Descarga la imagen desde Internet
-                //let image = showCharacterFromUrl(characterName: name) ?? #imageLiteral(resourceName: "contactIcon")
-                let image = #imageLiteral(resourceName: "contactIcon")
+                var image = #imageLiteral(resourceName: "contactIcon") // Imagen por defecto
+                if let url = URL(string: showCharacterFromUrl(characterName: name)) {
+                    do {
+                        let data = try Data(contentsOf: url)
+                        guard let downloadImage = UIImage(data: data) else { return }
+                        image = downloadImage
+                        
+                    } catch let error {
+                        print("Error al descargar la imagen de \(name): \(error.localizedDescription)")
+                    }
+                }
                 
                 // Extraemos el array de films de cada personaje y lo convertimos a Int
                 let extractedFilms = dataPerson["films"] as! [String]
-                let films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
+                var films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
+                films.sort{ $0 < $1 }
                 
-                // Almacenamos los valores obtenidos en una instancia de Film
-                let person = Person(name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color)
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedVehicles = dataPerson["vehicles"] as! [String]
+                var vehicles : [Int] = convertArrayStringToInt(arrayOfString: extractedVehicles)
+                vehicles.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedStarships = dataPerson["starships"] as! [String]
+                var starships : [Int] = convertArrayStringToInt(arrayOfString: extractedStarships)
+                starships.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedSpecies = dataPerson["species"] as! [String]
+                var species : [Int] = convertArrayStringToInt(arrayOfString: extractedSpecies)
+                species.sort{ $0 < $1 }
+                
+                // Almacenamos los valores obtenidos en una instancia de Planet
+                let person = Person(name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color, homeworld:  homeworld, vehicles: vehicles, starships: starships, species: species)
+                
+                completion(person, successCount)
+            } catch {
+                successCount -= 1
+                debugPrint(error)
+            }
+        }
+        
+        // And finally send it
+        task.resume()
+    }
+    
+} // End - getArrayOfCharactersFromPlanet
+
+
+// ---------------------------------------------------------------------------------
+
+func getArrayOfCharactersFromStarship(starship : Starship, completion: @escaping (Person?, Int?) -> Void ) {
+    
+    var successCount = starship.pilots.count
+    
+    for value in starship.pilots {
+        
+        let urlString = "https://swapi.co/api/people/\(value)/?format=json"
+        
+        // Check that the URL we’ve provided is valid
+        guard let urlRequest = URL(string: urlString) else {
+            print("Error: cannot create URL")
+            completion(nil, nil)
+            return
+        }
+        
+        
+        // Then we need a URLSession to use to send the request
+        let session = URLSession.shared
+        
+        // Then create the data task
+        let task = session.dataTask(with: urlRequest) { (data, _, error) in
+            // can't do print(response) since we don't have response
+            
+            // Check if any error exists
+            if let error = error {
+                print(error)
+                successCount -= 1
+                completion(nil, nil)
+                return
+            }
+            
+            guard let datos = data else {return}
+            
+            do {
+                let dataPerson = try JSONSerialization.jsonObject(with: datos) as! [String:Any]
+                
+                // Comprobación de que el objeto existe o no está vacío
+                if let error = dataPerson["detail"] as? String {
+                    print("Error: Data \(value) \(error)")
+                    // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
+                    successCount -= 1
+                    completion(nil, nil)
+                    return
+                }
+                
+                // Obtenemos los valores del diccionario
+                let name = dataPerson["name"] as! String
+                let gender = (dataPerson["gender"] as! String) == "none" || (dataPerson["gender"] as! String) == "n/a" ? "-" : (dataPerson["gender"] as! String).capitalizingFirstLetter()
+                let birth_year = (dataPerson["birth_year"] as! String) == "unknown" ? "-" : dataPerson["birth_year"] as! String
+                let height = (dataPerson["height"] as! String) == "unknown" ? "-" : dataPerson["height"] as! String
+                let mass = (dataPerson["mass"] as! String) == "unknown" ? "-" : dataPerson["mass"] as! String
+                let hair_color = (dataPerson["hair_color"] as! String) == "n/a" || (dataPerson["hair_color"] as! String) == "none" || (dataPerson["hair_color"] as! String) == "unknown" ? "-" : (dataPerson["hair_color"] as! String).capitalizingFirstLetter()
+                let skin_color = (dataPerson["skin_color"] as! String) == "none" || (dataPerson["skin_color"] as! String) == "unknown" ? "-" : (dataPerson["skin_color"] as! String).capitalizingFirstLetter()
+                let eye_color = dataPerson["eye_color"] as! String == "unknown" || (dataPerson["eye_color"] as! String) == "none" ? "-" : (dataPerson["eye_color"] as! String).capitalizingFirstLetter()
+                let homeworld = dataPerson["homeworld"] as! String == "unknown" || (dataPerson["homeworld"] as! String) == "none" ? "-" : (dataPerson["homeworld"] as! String).capitalizingFirstLetter()
+                
+                // Descarga la imagen desde Internet
+                var image = #imageLiteral(resourceName: "contactIcon") // Imagen por defecto
+                if let url = URL(string: showCharacterFromUrl(characterName: name)) {
+                    do {
+                        let data = try Data(contentsOf: url)
+                        guard let downloadImage = UIImage(data: data) else { return }
+                        image = downloadImage
+                        
+                    } catch let error {
+                        print("Error al descargar la imagen de \(name): \(error.localizedDescription)")
+                    }
+                }
+                
+                // Extraemos el array de films de cada personaje y lo convertimos a Int
+                let extractedFilms = dataPerson["films"] as! [String]
+                var films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
+                films.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedVehicles = dataPerson["vehicles"] as! [String]
+                var vehicles : [Int] = convertArrayStringToInt(arrayOfString: extractedVehicles)
+                vehicles.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedStarships = dataPerson["starships"] as! [String]
+                var starships : [Int] = convertArrayStringToInt(arrayOfString: extractedStarships)
+                starships.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedSpecies = dataPerson["species"] as! [String]
+                var species : [Int] = convertArrayStringToInt(arrayOfString: extractedSpecies)
+                species.sort{ $0 < $1 }
+                
+                // Almacenamos los valores obtenidos en una instancia de Planet
+                let person = Person(name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color, homeworld:  homeworld, vehicles: vehicles, starships: starships, species: species)
                 
                 completion(person, successCount)
             } catch {
@@ -334,24 +526,50 @@ func getArrayOfCharactersByID(value : Int, numberOfObjects: Int = 0, completion:
                 
                 // Obtenemos los valores del diccionario
                 let name = dataPerson["name"] as! String
-                let gender = (dataPerson["gender"] as! String) == "none" || (dataPerson["gender"] as! String) == "n/a" ? "-" : dataPerson["gender"] as! String
+                let gender = (dataPerson["gender"] as! String) == "none" || (dataPerson["gender"] as! String) == "n/a" ? "-" : (dataPerson["gender"] as! String).capitalizingFirstLetter()
                 let birth_year = (dataPerson["birth_year"] as! String) == "unknown" ? "-" : dataPerson["birth_year"] as! String
                 let height = (dataPerson["height"] as! String) == "unknown" ? "-" : dataPerson["height"] as! String
                 let mass = (dataPerson["mass"] as! String) == "unknown" ? "-" : dataPerson["mass"] as! String
-                let hair_color = (dataPerson["hair_color"] as! String) == "n/a" || (dataPerson["hair_color"] as! String) == "none" || (dataPerson["hair_color"] as! String) == "unknown" ? "-" : dataPerson["hair_color"] as! String
-                let skin_color = (dataPerson["skin_color"] as! String) == "none" || (dataPerson["skin_color"] as! String) == "unknown" ? "-" : dataPerson["skin_color"] as! String
-                let eye_color = dataPerson["eye_color"] as! String == "unknown" || (dataPerson["eye_color"] as! String) == "none" ? "-" : dataPerson["eye_color"] as! String
+                let hair_color = (dataPerson["hair_color"] as! String) == "n/a" || (dataPerson["hair_color"] as! String) == "none" || (dataPerson["hair_color"] as! String) == "unknown" ? "-" : (dataPerson["hair_color"] as! String).capitalizingFirstLetter()
+                let skin_color = (dataPerson["skin_color"] as! String) == "none" || (dataPerson["skin_color"] as! String) == "unknown" ? "-" : (dataPerson["skin_color"] as! String).capitalizingFirstLetter()
+                let eye_color = dataPerson["eye_color"] as! String == "unknown" || (dataPerson["eye_color"] as! String) == "none" ? "-" : (dataPerson["eye_color"] as! String).capitalizingFirstLetter()
+                let homeworld = dataPerson["homeworld"] as! String == "unknown" || (dataPerson["homeworld"] as! String) == "none" ? "-" : (dataPerson["homeworld"] as! String).capitalizingFirstLetter()
                 
                 // Descarga la imagen desde Internet
-                //let image = showCharacterFromUrl(characterName: name) ?? #imageLiteral(resourceName: "contactIcon")
-                let image = #imageLiteral(resourceName: "contactIcon")
+                var image = #imageLiteral(resourceName: "contactIcon") // Imagen por defecto
+                if let url = URL(string: showCharacterFromUrl(characterName: name)) {
+                    do {
+                        let data = try Data(contentsOf: url)
+                        guard let downloadImage = UIImage(data: data) else { return }
+                        image = downloadImage
+                        
+                    } catch let error {
+                        print("Error al descargar la imagen de \(name): \(error.localizedDescription)")
+                    }
+                }
                 
                 // Extraemos el array de films de cada personaje y lo convertimos a Int
                 let extractedFilms = dataPerson["films"] as! [String]
-                let films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
+                var films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
+                films.sort{ $0 < $1 }
                 
-                // Almacenamos los valores obtenidos en una instancia de Film
-                let person = Person(name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color)
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedVehicles = dataPerson["vehicles"] as! [String]
+                var vehicles : [Int] = convertArrayStringToInt(arrayOfString: extractedVehicles)
+                vehicles.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedStarships = dataPerson["starships"] as! [String]
+                var starships : [Int] = convertArrayStringToInt(arrayOfString: extractedStarships)
+                starships.sort{ $0 < $1 }
+                
+                // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
+                let extractedSpecies = dataPerson["species"] as! [String]
+                var species : [Int] = convertArrayStringToInt(arrayOfString: extractedSpecies)
+                species.sort{ $0 < $1 }
+                
+                // Almacenamos los valores obtenidos en una instancia de Planet
+                let person = Person(name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color, homeworld:  homeworld, vehicles: vehicles, starships: starships, species: species)
                 
                 completion(person, successCount)
             } catch {

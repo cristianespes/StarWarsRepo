@@ -29,7 +29,7 @@ class FilmDetail: UIViewController {
         self.filmImageView.image = self.film.image
         self.titleText.text = self.film.title
         self.descriptionText.text = self.film.opening_crawl
-        self.yearText.text = self.film.release_date
+        self.yearText.text = "Premiere: \(self.film.release_date)"
         
         // Título de la cabecera
         self.title = self.film.title
@@ -106,6 +106,7 @@ class FilmDetail: UIViewController {
         
         if segue.identifier == "showCharacterDetail" {
             if let indexPath = self.tableView.indexPathForSelectedRow{
+                
                 // Le pasamos el objeto
                 let selectedPerson  = self.people[indexPath.row]
                 
@@ -138,6 +139,7 @@ extension FilmDetail : UITableViewDataSource, UITableViewDelegate {
         return 1
     }
     
+    /*
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let view = UIView()
         
@@ -153,6 +155,10 @@ extension FilmDetail : UITableViewDataSource, UITableViewDelegate {
         view.addSubview(label)
         
         return view
+    }*/
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "Characters of the film"
     }
     
     // Esté método va junto con el anterior: viewForHeaderInSection
@@ -174,10 +180,17 @@ extension FilmDetail : UITableViewDataSource, UITableViewDelegate {
         cell.genderLabel.text = person.gender
         cell.birthLabel.text = person.birth_year
         
-        cell.thumbnailImageView.getImgFromUrl(link: showCharacterFromUrl(characterName: person.name), placeholder: #imageLiteral(resourceName: "contactIcon"), index: Int(indexPath.row), completion: nil)
-        
+        /*
+        cell.thumbnailImageView.getImgFromUrl(link: showCharacterFromUrl(characterName: person.name), placeholder: #imageLiteral(resourceName: "contactIcon"), index: Int(indexPath.row)) {
+            (image, index) in
+            self.people[index].image = image
+        }*/
+        cell.thumbnailImageView.image = person.image
         cell.thumbnailImageView.layer.cornerRadius = 10.0
         cell.thumbnailImageView.clipsToBounds = true
+        
+        // Añadir felcha en el lado derecho
+        cell.accessoryType = .disclosureIndicator
         
         return cell
     }

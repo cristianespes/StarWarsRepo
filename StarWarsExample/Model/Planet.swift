@@ -103,7 +103,20 @@ func getArrayOfPlanets(numberOfPlanets : Int, completion: @escaping (Planet?, In
                 let surface_water = (dataPlanet["surface_water"] as! String) == "unknown" ? "-" : dataPlanet["surface_water"] as! String
                 let population = (dataPlanet["population"] as! String) == "unknown" ? "-" : dataPlanet["population"] as! String
                 
-                let image = #imageLiteral(resourceName: "planetIcon")
+                // Descarga la imagen desde Internet
+                var image = #imageLiteral(resourceName: "planetIcon") // Imagen por defecto
+                if let url = URL(string: showPlanetFromUrl(planetName: name)) {
+                    
+                    do {
+                        let data = try Data(contentsOf: url)
+                        guard let downloadImage = UIImage(data: data) else { return }
+                        image = downloadImage
+                        
+                    } catch let error {
+                        print("Error al descargar la imagen de \(name): \(error.localizedDescription)")
+                    }
+                }
+                
                 
                 // Extraemos el array de films de cada personaje y lo convertimos a Int
                 let extractedFilms = dataPlanet["films"] as! [String]
@@ -129,6 +142,103 @@ func getArrayOfPlanets(numberOfPlanets : Int, completion: @escaping (Planet?, In
     }
     
 } // End - getArrayOfPlanets
+
+// ---------------------------------------------------------------------------------
+
+// MARK: - Get JSON from StarWars API
+
+func getPlanetByID(value : Int, numberOfObjects: Int = 0, completion: @escaping (Planet?, Int?) -> Void ) {
+    
+    var successCount = numberOfObjects
+        
+    let urlString = "https://swapi.co/api/planets/\(value)/?format=json"
+    
+    // Check that the URL we’ve provided is valid
+    guard let urlRequest = URL(string: urlString) else {
+        print("Error: cannot create URL")
+        completion(nil, nil)
+        return
+    }
+    
+    // Then we need a URLSession to use to send the request
+    let session = URLSession.shared
+    
+    // Then create the data task
+    let task = session.dataTask(with: urlRequest) { (data, _, error) in
+        // can't do print(response) since we don't have response
+        
+        // Check if any error exists
+        if let error = error {
+            print(error)
+            successCount -= 1
+            completion(nil, nil)
+            return
+        }
+        
+        guard let datos = data else {return}
+        
+        do {
+            let dataPlanet = try JSONSerialization.jsonObject(with: datos) as! [String:Any]
+            
+            // Comprobación de que el objeto existe o no está vacío
+            if let error = dataPlanet["detail"] as? String {
+                print("Error: Data \(value) \(error)")
+                // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
+                successCount -= 1
+                completion(nil, nil)
+                return
+            }
+            
+            // Obtenemos los valores del diccionario
+            let name = (dataPlanet["name"] as! String).capitalizingFirstLetter()
+            
+            let rotation_period = (dataPlanet["rotation_period"] as! String) == "unknown" ? "-" : (dataPlanet["rotation_period"] as! String).capitalizingFirstLetter()
+            let orbital_period = (dataPlanet["orbital_period"] as! String) == "unknown" ? "-" : dataPlanet["orbital_period"] as! String
+            let diameter = (dataPlanet["diameter"] as! String) == "unknown" ? "-" : dataPlanet["diameter"] as! String
+            let climate = (dataPlanet["climate"] as! String) == "unknown" ? "-" : (dataPlanet["climate"] as! String).capitalizingFirstLetter()
+            let gravity = (dataPlanet["gravity"] as! String) == "unknown" || (dataPlanet["gravity"] as! String) == "N/A" ? "-" : dataPlanet["gravity"] as! String
+            let terrain = (dataPlanet["terrain"] as! String) == "unknown" ? "-" : (dataPlanet["terrain"] as! String).capitalizingFirstLetter()
+            let surface_water = (dataPlanet["surface_water"] as! String) == "unknown" ? "-" : dataPlanet["surface_water"] as! String
+            let population = (dataPlanet["population"] as! String) == "unknown" ? "-" : dataPlanet["population"] as! String
+            
+            // Descarga la imagen desde Internet
+            var image = #imageLiteral(resourceName: "planetIcon") // Imagen por defecto
+            if let url = URL(string: showPlanetFromUrl(planetName: name)) {
+                
+                do {
+                    let data = try Data(contentsOf: url)
+                    guard let downloadImage = UIImage(data: data) else { return }
+                    image = downloadImage
+                    
+                } catch let error {
+                    print("Error al descargar la imagen de \(name): \(error.localizedDescription)")
+                }
+            }
+            
+            
+            // Extraemos el array de films de cada personaje y lo convertimos a Int
+            let extractedFilms = dataPlanet["films"] as! [String]
+            var films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
+            films.sort{ $0 < $1}
+            
+            let extractedResidents = dataPlanet["residents"] as! [String]
+            let auxResidents : [Int] = convertArrayStringToInt(arrayOfString: extractedResidents)
+            let residents : [String] = convertArrayIntToString(arrayOfInt: auxResidents)
+            
+            // Almacenamos los valores obtenidos en una instancia de Planet
+            let planet = Planet(name: name, rotation_period: rotation_period, orbital_period: orbital_period, diameter: diameter, climate: climate, gravity: gravity, terrain: terrain, surface_water: surface_water, population: population, image: image, residents: residents, films: films)
+            
+            completion(planet, successCount)
+        } catch {
+            successCount -= 1
+            debugPrint(error)
+        }
+    }
+    
+    // And finally send it
+    task.resume()
+    
+} // End - getPlanetByID
 
 // ---------------------------------------------------------------------------------
 
@@ -263,6 +373,4 @@ func showPlanetFromUrl(planetName: String) -> String {
     }
     
 }
-
-
 
