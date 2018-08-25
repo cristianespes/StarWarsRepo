@@ -150,7 +150,28 @@ class PlanetViewController: UITableViewController {
                 // Ejecutamos la función para obtener el array con todos los personajes
                 getArrayOfPlanets(numberOfPlanets: numberOfObjects) { getPlanet, successCount in
                     
-                    guard let checkPlanet = getPlanet else { return }
+                    guard let finalCount = successCount else { return }
+                    
+                    guard let checkPlanet = getPlanet else {
+                        
+                        // Si llegamos aquí, no ha llegado ningún objeto
+                        
+                        // Si coincide con el último, actualizar la tabla
+                        if finalCount == self.planets.count {
+                            // Enviamos al hilo principal las siguientes acciones
+                            DispatchQueue.main.async {
+                                // Paramos la animación de carga
+                                self.activityIndicator.stopAnimating()
+                                
+                                // Recargar la tableView en el hilo principal
+                                self.tableView.reloadData()
+                            } // End - DispatchQueue
+                        } // End - if
+                        
+                        return
+                    }
+                    
+                    // Si llegamos aquí, ha llegado un objeto
                     
                     // Añadir nuevo personaje al array
                     self.planets += [checkPlanet]
@@ -158,8 +179,8 @@ class PlanetViewController: UITableViewController {
                     // Reordenamos el array de Personales por orden de episodios
                     self.planets.sort{ $0.name < $1.name}
                     
-                    guard let finalCount = successCount else { return }
                     
+                    // Si estamos ante el último objeto
                     if finalCount == self.planets.count {
                         // Enviamos al hilo principal las siguientes acciones
                         DispatchQueue.main.async {

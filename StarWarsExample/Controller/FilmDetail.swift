@@ -73,7 +73,22 @@ class FilmDetail: UIViewController {
                 getArrayOfCharactersFromFilm(film: self.film)
                 { getCharacter, successCount in
                     
-                    guard let checkCharacter = getCharacter else { return }
+                    guard let finalCount = successCount else { return }
+                    
+                    guard let checkCharacter = getCharacter else {
+                        
+                        if finalCount == self.people.count {
+                            
+                            // Enviamos al hilo principal las siguientes acciones
+                            DispatchQueue.main.async {
+                                // Recargar la tableView en el hilo principal
+                                self.tableView.reloadData()
+                            } // End - DispatchQueue
+                            
+                        } // End - if
+                        
+                        return
+                    } // End - guar
                     
                     // Añadir nuevo personaje al array
                     self.people += [checkCharacter]
@@ -81,7 +96,6 @@ class FilmDetail: UIViewController {
                     // Reordenamos el array de Personales por orden de episodios
                     self.people.sort{ $0.name < $1.name}
                     
-                    guard let finalCount = successCount else { return }
                     
                     if finalCount == self.people.count {
                         // Enviamos al hilo principal las siguientes acciones

@@ -155,6 +155,50 @@ class ViewController: UITableViewController {
                 
                 getArrayOfFilms(numberOfFilms: numberOfObjects, completion: {
                     getFilm, successCount  in
+                    
+                    
+                    guard let finalCount = successCount else { return }
+                    
+                    guard let checkFilm = getFilm else {
+                        
+                        if finalCount == self.films.count {
+                            // Enviamos al hilo principal las siguientes acciones
+                            DispatchQueue.main.async {
+                                // Paramos la animación de carga
+                                self.activityIndicator.stopAnimating()
+                                
+                                // Recargar la tableView en el hilo principal
+                                self.tableView.reloadData()
+                            } // End - DispatchQueue
+                        } // End - if
+                        
+                        return
+                    }
+                    
+                    // Si llegamos aquí, ha llegado un objeto
+                    
+                    // Añadir nuevo personaje al array
+                    self.films += [checkFilm]
+                    
+                    // Reordenamos el array de Personales por orden de episodios
+                    self.films.sort{ $0.episode < $1.episode}
+                    
+                    
+                    // Si estamos ante el último objeto
+                    if finalCount == self.films.count {
+                        // Enviamos al hilo principal las siguientes acciones
+                        DispatchQueue.main.async {
+                            
+                            // Paramos la animación de carga
+                            self.activityIndicator.stopAnimating()
+                            
+                            // Recargar la tableView en el hilo principal
+                            self.tableView.reloadData()
+                            
+                        } // End - DispatchQueue
+                    } // End - if
+                    
+                    /*
                     if let checkFilm = getFilm {
                             
                             // Añadir nueva película al array
@@ -182,7 +226,7 @@ class ViewController: UITableViewController {
                         } // End - DispatchQueue.main.async
                         
                     } // End - if
-                    
+                    */
                     
                 }) // End - getArrayOfFilms
                 

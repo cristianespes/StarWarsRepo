@@ -91,7 +91,7 @@ func getArrayOfCharacters(numberOfCharacters : Int, completion: @escaping (Perso
                     print("Error: Data \(value) \(error)")
                     // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
                     successCount -= 1
-                    completion(nil, nil)
+                    completion(nil, successCount)
                     return
                 }
                 
@@ -199,7 +199,7 @@ func getArrayOfCharactersFromFilm(film : Film, completion: @escaping (Person?, I
                     print("Error: Data \(value) \(error)")
                     // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
                     successCount -= 1
-                    completion(nil, nil)
+                    completion(nil, successCount)
                     return
                 }
                 
@@ -307,7 +307,7 @@ func getArrayOfCharactersFromPlanet(planet : Planet, completion: @escaping (Pers
                     print("Error: Data \(value) \(error)")
                     // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
                     successCount -= 1
-                    completion(nil, nil)
+                    completion(nil, successCount)
                     return
                 }
                 
@@ -415,7 +415,7 @@ func getArrayOfCharactersFromStarship(starship : Starship, completion: @escaping
                     print("Error: Data \(value) \(error)")
                     // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
                     successCount -= 1
-                    completion(nil, nil)
+                    completion(nil, successCount)
                     return
                 }
                 
@@ -520,7 +520,7 @@ func getArrayOfCharactersByID(value : Int, numberOfObjects: Int = 0, completion:
                     print("Error: Data \(value) \(error)")
                     // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
                     successCount -= 1
-                    completion(nil, nil)
+                    completion(nil, successCount)
                     return
                 }
                 

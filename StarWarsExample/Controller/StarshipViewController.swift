@@ -146,7 +146,30 @@ class StarshipViewController: UITableViewController {
                 // Ejecutamos la función para obtener el array con todos los personajes
                 getArrayOfStarships(numberOfStarships: numberOfObjects) { getStarship, successCount in
                     
-                    guard let checkStarship = getStarship else { return }
+                    guard let finalCount = successCount else { return }
+                    
+                    guard let checkStarship = getStarship else {
+                        
+                        // Si llegamos aquí, no ha llegado ningún objeto
+                        
+                        // Si coincide con el último, actualizar la tabla
+                        if finalCount == self.starships.count {
+                            // Enviamos al hilo principal las siguientes acciones
+                            DispatchQueue.main.async {
+                                // Paramos la animación de carga
+                                self.activityIndicator.stopAnimating()
+                                
+                                // Recargar la tableView en el hilo principal
+                                self.tableView.reloadData()
+                            } // End - DispatchQueue
+                        } // End - if
+                        
+                        return
+                        
+                    } // End - guard let checkStarship = getStarship
+                    
+                    
+                    // Si llegamos aquí, ha llegado un objeto
                     
                     // Añadir nuevo personaje al array
                     self.starships += [checkStarship]
@@ -154,8 +177,8 @@ class StarshipViewController: UITableViewController {
                     // Reordenamos el array de Personales por orden de episodios
                     self.starships.sort{ $0.name < $1.name}
                     
-                    guard let finalCount = successCount else { return }
                     
+                    // Si estamos ante el último objeto
                     if finalCount == self.starships.count {
                         // Enviamos al hilo principal las siguientes acciones
                         DispatchQueue.main.async {

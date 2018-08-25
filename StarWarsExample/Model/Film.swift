@@ -84,7 +84,7 @@ func getArrayOfFilms(numberOfFilms : Int, completion: @escaping (Film?, Int?) ->
                     print("Error: Data \(value) \(error)")
                     // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
                     successCount -= 1
-                    completion(nil, nil)
+                    completion(nil, successCount)
                     return
                 }
                 

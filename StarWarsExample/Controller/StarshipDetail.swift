@@ -56,7 +56,21 @@ class StarshipDetail: UIViewController {
             getArrayOfCharactersFromStarship(starship: self.starship)
             { getCharacter, successCount in
                 
-                guard let checkCharacter = getCharacter else { return }
+                guard let finalCount = successCount else { return }
+                
+                guard let checkCharacter = getCharacter else {
+                    
+                    // Si coincide con el último, actualizar la tabla
+                    if finalCount == self.pilots.count {
+                        // Enviamos al hilo principal las siguientes acciones
+                        DispatchQueue.main.async {
+                            // Recargar la tableView en el hilo principal
+                            self.starshipTableView.reloadData()
+                        } // End - DispatchQueue
+                    } // End - if
+                    
+                    return
+                }
                 
                 // Añadir nuevo personaje al array
                 self.pilots += [checkCharacter.name]
@@ -64,7 +78,6 @@ class StarshipDetail: UIViewController {
                 // Reordenamos el array de Personales por orden de episodios
                 self.pilots.sort{ $0 < $1 }
                 
-                guard let finalCount = successCount else { return }
                 
                 if finalCount == self.pilots.count {
                     // Enviamos al hilo principal las siguientes acciones

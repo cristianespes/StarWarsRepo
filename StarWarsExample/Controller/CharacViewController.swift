@@ -155,16 +155,34 @@ class CharacViewController: UITableViewController {
                 // Ejecutamos la función para obtener el array con todos los personajes
                 getArrayOfCharacters(numberOfCharacters: numberOfObjects) { getCharacter, successCount in
                     
-                    guard let checkCharacter = getCharacter else { return }
-                        
-                        // Añadir nuevo personaje al array
-                        self.people += [checkCharacter]
-                        
-                        // Reordenamos el array de Personales por orden de episodios
-                        self.people.sort{ $0.name < $1.name}
-                    
                     guard let finalCount = successCount else { return }
                     
+                    guard let checkCharacter = getCharacter else {
+                        
+                        if finalCount == self.people.count {
+                            // Enviamos al hilo principal las siguientes acciones
+                            DispatchQueue.main.async {
+                                // Paramos la animación de carga
+                                self.activityIndicator.stopAnimating()
+                                
+                                // Recargar la tableView en el hilo principal
+                                self.tableView.reloadData()
+                            } // End - DispatchQueue
+                        } // End - if
+                        
+                        return
+                    }
+                    
+                    // Si llegamos aquí, ha llegado un objeto
+                        
+                    // Añadir nuevo personaje al array
+                    self.people += [checkCharacter]
+                    
+                    // Reordenamos el array de Personales por orden de episodios
+                    self.people.sort{ $0.name < $1.name}
+                    
+                    
+                    // Si estamos ante el último objeto
                     if finalCount == self.people.count {
                         // Enviamos al hilo principal las siguientes acciones
                         DispatchQueue.main.async {

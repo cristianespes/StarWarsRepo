@@ -87,7 +87,7 @@ func getArrayOfPlanets(numberOfPlanets : Int, completion: @escaping (Planet?, In
                     print("Error: Data \(value) \(error)")
                     // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
                     successCount -= 1
-                    completion(nil, nil)
+                    completion(nil, successCount)
                     return
                 }
                 
@@ -185,7 +185,7 @@ func getPlanetByID(value : Int, numberOfObjects: Int = 0, completion: @escaping 
                 print("Error: Data \(value) \(error)")
                 // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
                 successCount -= 1
-                completion(nil, nil)
+                completion(nil, successCount)
                 return
             }
             

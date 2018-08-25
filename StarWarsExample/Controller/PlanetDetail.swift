@@ -54,15 +54,27 @@ class PlanetDetail: UIViewController {
             getArrayOfCharactersFromPlanet(planet: self.planet)
             { getCharacter, successCount in
                 
-                guard let checkCharacter = getCharacter else { return }
+                guard let finalCount = successCount else { return }
+                
+                guard let checkCharacter = getCharacter else {
+                    
+                    if finalCount == self.residents.count {
+                        // Enviamos al hilo principal las siguientes acciones
+                        DispatchQueue.main.async {
+                            // Recargar la tableView en el hilo principal
+                            self.planetTableView.reloadData()
+                        } // End - DispatchQueue
+                    } // End - if
+                    
+                    return
+                } // End - guard
                 
                 // Añadir nuevo personaje al array
                 self.residents += [checkCharacter.name]
                 
                 // Reordenamos el array de Personales por orden de episodios
                 self.residents.sort{ $0 < $1}
-                
-                guard let finalCount = successCount else { return }
+
                 
                 if finalCount == self.residents.count {
                     // Enviamos al hilo principal las siguientes acciones

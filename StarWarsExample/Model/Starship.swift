@@ -103,13 +103,12 @@ func getArrayOfStarships(numberOfStarships : Int, completion: @escaping (Starshi
                     print("Error: Data \(value) \(error)")
                     // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
                     successCount -= 1
-                    completion(nil, nil)
+                    completion(nil, successCount)
                     return
                 }
                 
                 // Obtenemos los valores del diccionario
                 let name = (dataStarship["name"] as! String).capitalizingFirstLetter()
-                
                 let model = (dataStarship["model"] as! String) == "unknown" ? "-" : (dataStarship["model"] as! String).capitalizingFirstLetter()
                 let manufacturer = (dataStarship["manufacturer"] as! String) == "unknown" ? "-" : dataStarship["manufacturer"] as! String
                 let cost_in_credits = (dataStarship["cost_in_credits"] as! String) == "unknown" ? "-" : dataStarship["cost_in_credits"] as! String
@@ -209,7 +208,7 @@ func getStarshipByID(value : Int, numberOfObjects: Int = 0, completion: @escapin
                 print("Error: Data \(value) \(error)")
                 // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
                 successCount -= 1
-                completion(nil, nil)
+                completion(nil, successCount)
                 return
             }
             
