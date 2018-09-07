@@ -15,6 +15,64 @@ struct Resource : Decodable {
 
 // ---------------------------------------------------------------------------------
 
+// MARK: - Get JSON from StarWars API
+
+func getArrayOfAllObjects(nameResource : String, completion: @escaping (Int?, [AnyObject]?) -> Void ) {
+    
+    let urlString = "http://starwarsapi.cristianespes.com/apiv1/\(nameResource)"
+    
+    // Check that the URL we’ve provided is valid
+    guard let urlRequest = URL(string: urlString) else {
+        print("Error: cannot create URL")
+        completion(nil, nil)
+        return
+    }
+    
+    // Then we need a URLSession to use to send the request
+    let session = URLSession.shared
+    
+    // Then create the data task
+    let task = session.dataTask(with: urlRequest) { (data, _, error) in
+        // can't do print(response) since we don't have response
+        
+        // Check if any error exists
+        if let error = error {
+            print(error)
+            completion(nil, nil)
+            return
+        }
+        
+        guard let datos = data else {return}
+        
+        
+        do {
+            let dataObject = try JSONSerialization.jsonObject(with: datos) as! [String : Any]
+            
+            // Comprobación de que el objeto existe o no está vacío
+            if let success = dataObject["success"] as? Bool, success == false {
+                print("Error: Data success: \(success)")
+                // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
+                completion(nil, nil)
+                return
+            }
+            
+            // Obtenemos los valores del diccionario
+            let count = dataObject["count"] as! Int
+            let result = dataObject["result"] as! [AnyObject]
+            
+            completion(count, result)
+        } catch {
+            debugPrint(error)
+        }
+    }
+    
+    // And finally send it
+    task.resume()
+    
+} // End - getArrayOfAllObjects
+
+// ---------------------------------------------------------------------------------
+
 func convertArrayStringToInt(arrayOfString: [String]) -> [Int] {
     
     var arrayOfNumber : [Int] = []

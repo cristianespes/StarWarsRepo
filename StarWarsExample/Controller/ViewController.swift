@@ -143,95 +143,19 @@ class ViewController: UITableViewController {
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
             
-            // Realizamos el recuento de objetos para el recurso de films
-            getNumberOfObjects(nameResource: "films", arrayObject : self.films) { getObject in
-                
-                // Si recibe el número de peliculas
-                guard let numberOfObjects = getObject else {
-                    // Si no las llega a recibir
-                    print("Ocurrió un error")
-                    return
+            getArrayOfAllObjects(nameResource : "films") {count, objects in
+                if let objects = objects {
+                    self.films = returnArrayOfAllFilmsFromData(result: objects)
+                    
+                    DispatchQueue.main.async {
+                        // Paramos la animación de carga
+                        self.activityIndicator.stopAnimating()
+                        
+                        // Recargar la tableView en el hilo principal
+                        self.tableView.reloadData()
+                    } // End - DispatchQueue
                 }
-                
-                getArrayOfFilms(numberOfFilms: numberOfObjects, completion: {
-                    getFilm, successCount  in
-                    
-                    
-                    guard let finalCount = successCount else { return }
-                    
-                    guard let checkFilm = getFilm else {
-                        
-                        if finalCount == self.films.count {
-                            // Enviamos al hilo principal las siguientes acciones
-                            DispatchQueue.main.async {
-                                // Paramos la animación de carga
-                                self.activityIndicator.stopAnimating()
-                                
-                                // Recargar la tableView en el hilo principal
-                                self.tableView.reloadData()
-                            } // End - DispatchQueue
-                        } // End - if
-                        
-                        return
-                    }
-                    
-                    // Si llegamos aquí, ha llegado un objeto
-                    
-                    // Añadir nuevo personaje al array
-                    self.films += [checkFilm]
-                    
-                    // Reordenamos el array de Personales por orden de episodios
-                    self.films.sort{ $0.episode < $1.episode}
-                    
-                    
-                    // Si estamos ante el último objeto
-                    if finalCount == self.films.count {
-                        // Enviamos al hilo principal las siguientes acciones
-                        DispatchQueue.main.async {
-                            
-                            // Paramos la animación de carga
-                            self.activityIndicator.stopAnimating()
-                            
-                            // Recargar la tableView en el hilo principal
-                            self.tableView.reloadData()
-                            
-                        } // End - DispatchQueue
-                    } // End - if
-                    
-                    /*
-                    if let checkFilm = getFilm {
-                            
-                            // Añadir nueva película al array
-                            self.films += [checkFilm]
-                            
-                            // Reordenamos el array de Películas por orden de episodios
-                            self.films.sort{ $0.episode < $1.episode}
-                        
-                    } // End - if
-                    
-                    guard let count = successCount else { return }
-                    
-                    // Cuando se haya completado el array con todos los objetos
-                    if count == self.films.count {
-                        
-                        // Enviamos al hilo principal las siguientes acciones
-                        DispatchQueue.main.async {
-                            
-                            // Paramos la animación de carga
-                            self.activityIndicator.stopAnimating()
-                            
-                            // Recargar la tableView en el hilo principal
-                            self.tableView.reloadData()
-                            
-                        } // End - DispatchQueue.main.async
-                        
-                    } // End - if
-                    */
-                    
-                }) // End - getArrayOfFilms
-                
-                
-            } // End - getNumberOfObjects
+            }
             
         } // End - DispatchQueue.global().async
         
@@ -267,18 +191,42 @@ class ViewController: UITableViewController {
         }
         
         let cellID = "filmCell"
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! FilmCell
         cell.thumbnailImageView.image = film.image
         cell.titleLabel.text = film.title
         cell.descriptionLabel.text = film.opening_crawl
         cell.releaseYearLabel.text = "Premiere: " + film.release_date
-        
         cell.thumbnailImageView.layer.cornerRadius = 10.0
         cell.thumbnailImageView.clipsToBounds = true
-        
-        // Añadir felcha en el lado derecho
         cell.accessoryType = .disclosureIndicator
+        
+        /*
+        switch indexPath.section {
+        case 0:
+            if (film.subtitle.range(of:"Episode") != nil) {
+                cell.thumbnailImageView.image = film.image
+                cell.titleLabel.text = film.title
+                cell.descriptionLabel.text = film.opening_crawl
+                cell.releaseYearLabel.text = "Premiere: " + film.release_date
+                
+                cell.thumbnailImageView.layer.cornerRadius = 10.0
+                cell.thumbnailImageView.clipsToBounds = true
+                
+                // Añadir felcha en el lado derecho
+                cell.accessoryType = .disclosureIndicator
+            }
+        default:
+            cell.thumbnailImageView.image = film.image
+            cell.titleLabel.text = film.title
+            cell.descriptionLabel.text = film.opening_crawl
+            cell.releaseYearLabel.text = "Premiere: " + film.release_date
+            
+            cell.thumbnailImageView.layer.cornerRadius = 10.0
+            cell.thumbnailImageView.clipsToBounds = true
+            
+            // Añadir felcha en el lado derecho
+            cell.accessoryType = .disclosureIndicator
+        }*/
         
         return cell
     }
