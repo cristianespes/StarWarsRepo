@@ -43,10 +43,32 @@ class PlanetDetail: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    // MARK: - Downloading character data of the film from API
+    // MARK: - Downloading character data of the planet from API
     
     func downloadCharacterDataOfThePlanetFromAPI() {
         
+        // Ejecutamos en segundo plano la descarga de los datos desde la API
+        DispatchQueue.global().async {
+            
+            
+            getArrayOfAllObjects(nameResource : "people") {count, objects in
+                if let objects = objects {
+                    
+                     let people = getArrayOfCharactersFromPlanet(planet: self.planet, result: objects)
+                    
+                    for person in people {
+                        self.residents += [person.name]
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.planetTableView.reloadData()
+                    } // End - DispatchQueue
+                }
+            }
+            
+        } // End - DispatchQueue.global().async
+        
+        /*
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
             
@@ -89,7 +111,7 @@ class PlanetDetail: UIViewController {
             } // End - getArrayOfCharactersFromFilm
             
         } // End - DispatchQueue.global().async
-        
+        */
     } // End - downloadCharacterDataOfThePlanetFromAPI()
     
     

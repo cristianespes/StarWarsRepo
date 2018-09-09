@@ -19,7 +19,8 @@ struct Resource : Decodable {
 
 func getArrayOfAllObjects(nameResource : String, completion: @escaping (Int?, [AnyObject]?) -> Void ) {
     
-    let urlString = "http://starwarsapi.cristianespes.com/apiv1/\(nameResource)"
+    let urlString = "http://127.0.0.1:3001/apiv1/\(nameResource)"
+    //let urlString = "http://starwarsapi.cristianespes.com/apiv1/\(nameResource)"
     
     // Check that the URL we’ve provided is valid
     guard let urlRequest = URL(string: urlString) else {

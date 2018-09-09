@@ -11,6 +11,7 @@ import UIKit
 
 class Starship {
     
+    let id : Int
     let name : String
     let model : String
     let manufacturer : String
@@ -29,8 +30,8 @@ class Starship {
     let url : Int
     var image : UIImage
     
-    init(name: String, model: String, manufacturer: String, cost_in_credits: String, length: String, max_atmosphering_speed: String, crew: String, passengers: String, cargo_capacity: String, consumables: String, hyperdrive_rating: String, MGLT: String, starship_class: String, pilots: [String], films: [Int], url: Int, image: UIImage) {
-        
+    init(id: Int, name: String, model: String, manufacturer: String, cost_in_credits: String, length: String, max_atmosphering_speed: String, crew: String, passengers: String, cargo_capacity: String, consumables: String, hyperdrive_rating: String, MGLT: String, starship_class: String, pilots: [String], films: [Int], url: Int, image: UIImage) {
+        self.id = id
         self.name = name
         self.model = model
         self.manufacturer = manufacturer
@@ -48,9 +49,7 @@ class Starship {
         self.films = films
         self.url = url
         self.image = image
-        
     }
-    
     
 } // End - class Starships
 
@@ -59,6 +58,81 @@ class Starship {
 
 // MARK: - Get JSON from StarWars API
 
+
+// Cargar los datos del planeta con los datos de la API
+
+func generateStarshipFromJsonData(dataStarship: AnyObject) -> Starship {
+    
+    // Extraemos los valores del diccionario
+    let id = dataStarship["id"] as! Int
+    let name = (dataStarship["name"] as! String).capitalizingFirstLetter()
+    let model = (dataStarship["model"] as! String) == "unknown" ? "-" : (dataStarship["model"] as! String).capitalizingFirstLetter()
+    let manufacturer = (dataStarship["manufacturer"] as! String) == "unknown" ? "-" : dataStarship["manufacturer"] as! String
+    let cost_in_credits = (dataStarship["cost_in_credits"] as! String) == "unknown" ? "-" : dataStarship["cost_in_credits"] as! String
+    let length = (dataStarship["length"] as! String) == "unknown" ? "-" : (dataStarship["length"] as! String).capitalizingFirstLetter()
+    let max_atmosphering_speed = (dataStarship["max_atmosphering_speed"] as! String) == "unknown" || (dataStarship["max_atmosphering_speed"] as! String) == "n/a" ? "-" : dataStarship["max_atmosphering_speed"] as! String
+    let crew = (dataStarship["crew"] as! String) == "unknown" ? "-" : (dataStarship["crew"] as! String).capitalizingFirstLetter()
+    let passengers = (dataStarship["passengers"] as! String) == "unknown" ? "-" : dataStarship["passengers"] as! String
+    let cargo_capacity = (dataStarship["cargo_capacity"] as! String) == "unknown" ? "-" : dataStarship["cargo_capacity"] as! String
+    let consumables = (dataStarship["consumables"] as! String) == "unknown" ? "-" : dataStarship["consumables"] as! String
+    let hyperdrive_rating = (dataStarship["hyperdrive_rating"] as! String) == "unknown" ? "-" : dataStarship["hyperdrive_rating"] as! String
+    let MGLT = (dataStarship["MGLT"] as! String) == "unknown" ? "-" : dataStarship["MGLT"] as! String
+    let starship_class = (dataStarship["starship_class"] as! String) == "unknown" ? "-" : (dataStarship["starship_class"] as! String).capitalizingFirstLetter()
+    
+    
+    // Descarga la imagen desde Internet
+    var image = #imageLiteral(resourceName: "starshipIcon") // Imagen por defecto
+    let imageUrl = dataStarship["image"] as! String
+    if let url = URL(string: imageUrl) {
+        do {
+            let data = try Data(contentsOf: url)
+            if let downloadImage = UIImage(data: data) {
+                image = downloadImage
+            }
+            
+        } catch let error {
+            print("Error al descargar la imagen de \(name): \(error.localizedDescription)")
+        }
+    }
+    
+    
+    // Extraemos el array de films de cada personaje y lo convertimos a Int
+    let extractedEpisodes = dataStarship["episodes"] as! [String]
+    var episodes : [Int] = convertArrayStringToInt(arrayOfString: extractedEpisodes)
+    episodes.sort{ $0 < $1}
+    
+    let extractedPilots = dataStarship["pilots"] as! [String]
+    let auxPilots : [Int] = convertArrayStringToInt(arrayOfString: extractedPilots)
+    let pilots : [String] = convertArrayIntToString(arrayOfInt: auxPilots)
+    
+    let auxURL = dataStarship["url"] as! String
+    let url = convertStringToInt(string: auxURL)
+    
+    // Almacenamos los valores obtenidos en una instancia de Planet
+    let starship = Starship(id: id, name: name, model: model, manufacturer: manufacturer, cost_in_credits: cost_in_credits, length: length, max_atmosphering_speed: max_atmosphering_speed, crew: crew, passengers: passengers, cargo_capacity: cargo_capacity, consumables: consumables, hyperdrive_rating: hyperdrive_rating, MGLT: MGLT, starship_class: starship_class, pilots: pilots, films: episodes, url: url, image: image)
+    
+    return starship
+} // End - func generateStarshipFromJsonData
+
+
+func returnArrayOfAllStarshipsFromData(result: [AnyObject]) -> [Starship] {
+    
+    var arrayOfStarship : [Starship] = []
+    
+    for object in result {
+        
+        let starship = generateStarshipFromJsonData(dataStarship: object)
+        
+        arrayOfStarship.append(starship)
+    }
+    
+    return arrayOfStarship
+    
+}
+
+
+
+/*
 func getArrayOfStarships(numberOfStarships : Int, completion: @escaping (Starship?, Int?) -> Void ) {
     
     // La API no devuelve el número total de Starships, hay que meterlo a mano
@@ -165,11 +239,37 @@ func getArrayOfStarships(numberOfStarships : Int, completion: @escaping (Starshi
     }
     
 } // End - getArrayOfStarships
-
+*/
 // ---------------------------------------------------------------------------------
 
 // MARK: - Get JSON from StarWars API
 
+
+func getArrayOfPlanetsFromID(id: Int, result: [AnyObject]) -> Starship? {
+    
+    var starship : Starship? = nil
+    
+    for object in result {
+        
+        // Comprobación que corresponde a la película
+        // Recogemos los episodios en los que aparece el personaje
+        let starshipID = object["id"] as! Int
+        
+        if starshipID == id {
+            
+            starship = generateStarshipFromJsonData(dataStarship: object)
+            
+            return starship
+            
+        } // End - if
+        
+    } // End - for
+    
+    return starship
+    
+} // End - getArrayOfPlanetsFromID
+
+/*
 func getStarshipByID(value : Int, numberOfObjects: Int = 0, completion: @escaping (Starship?, Int?) -> Void ) {
     
     var successCount = numberOfObjects
@@ -270,7 +370,7 @@ func getStarshipByID(value : Int, numberOfObjects: Int = 0, completion: @escapin
     task.resume()
     
 } // End - getStarshipByID
-
+*/
 
 
 // ---------------------------------------------------------------------------------

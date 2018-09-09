@@ -12,6 +12,7 @@ import UIKit
 
 class Planet {
     
+    let id : Int
     let name : String
     let rotation_period : String
     let orbital_period : String
@@ -24,8 +25,10 @@ class Planet {
     var image : UIImage
     var residents : [String]
     var films : [Int]
+    let url : Int
     
-    init(name: String, rotation_period: String, orbital_period: String,  diameter: String, climate: String, gravity: String, terrain: String, surface_water: String, population: String, image: UIImage, residents: [String], films: [Int]) {
+    init(id: Int, name: String, rotation_period: String, orbital_period: String,  diameter: String, climate: String, gravity: String, terrain: String, surface_water: String, population: String, image: UIImage, residents: [String], films: [Int], url: Int) {
+        self.id = id
         self.name = name
         self.rotation_period = rotation_period
         self.orbital_period = orbital_period
@@ -38,6 +41,7 @@ class Planet {
         self.image = image
         self.residents = residents
         self.films = films
+        self.url = url
     }
 } // End - class Planet
 
@@ -46,6 +50,73 @@ class Planet {
 
 // MARK: - Get JSON from StarWars API
 
+// Cargar los datos del planeta con los datos de la API
+
+func generatePlanetFromJsonData(dataPlanet: AnyObject) -> Planet {
+    
+    // Extraemos los valores del diccionario
+    let id = dataPlanet["id"] as! Int
+    let name = (dataPlanet["name"] as! String).capitalizingFirstLetter()
+    let rotation_period = (dataPlanet["rotation_period"] as! String) == "unknown" ? "-" : (dataPlanet["rotation_period"] as! String).capitalizingFirstLetter()
+    let orbital_period = (dataPlanet["orbital_period"] as! String) == "unknown" ? "-" : dataPlanet["orbital_period"] as! String
+    let diameter = (dataPlanet["diameter"] as! String) == "unknown" ? "-" : dataPlanet["diameter"] as! String
+    let climate = (dataPlanet["climate"] as! String) == "unknown" ? "-" : (dataPlanet["climate"] as! String).capitalizingFirstLetter()
+    let gravity = (dataPlanet["gravity"] as! String) == "unknown" || (dataPlanet["gravity"] as! String) == "N/A" ? "-" : dataPlanet["gravity"] as! String
+    let terrain = (dataPlanet["terrain"] as! String) == "unknown" ? "-" : (dataPlanet["terrain"] as! String).capitalizingFirstLetter()
+    let surface_water = (dataPlanet["surface_water"] as! String) == "unknown" ? "-" : dataPlanet["surface_water"] as! String
+    let population = (dataPlanet["population"] as! String) == "unknown" ? "-" : dataPlanet["population"] as! String
+    let auxUrl = dataPlanet["url"] as! String
+    let url = convertStringToInt(string: auxUrl)
+    
+    // Descarga la imagen desde Internet
+    var image = #imageLiteral(resourceName: "planetIcon") // Imagen por defecto
+    let imageUrl = dataPlanet["image"] as! String
+    if let url = URL(string: imageUrl) {
+        do {
+            let data = try Data(contentsOf: url)
+            if let downloadImage = UIImage(data: data) {
+                image = downloadImage
+            }
+            
+        } catch let error {
+            print("Error al descargar la imagen de \(name): \(error.localizedDescription)")
+        }
+    }
+    
+    
+    // Extraemos el array de films de cada personaje y lo convertimos a Int
+    let extractedEpisodes = dataPlanet["episodes"] as! [String]
+    var episodes : [Int] = convertArrayStringToInt(arrayOfString: extractedEpisodes)
+    episodes.sort{ $0 < $1}
+    
+    let extractedResidents = dataPlanet["residents"] as! [String]
+    let auxResidents : [Int] = convertArrayStringToInt(arrayOfString: extractedResidents)
+    let residents : [String] = convertArrayIntToString(arrayOfInt: auxResidents)
+    
+    // Almacenamos los valores obtenidos en una instancia de Planet
+    let planet = Planet(id: id, name: name, rotation_period: rotation_period, orbital_period: orbital_period, diameter: diameter, climate: climate, gravity: gravity, terrain: terrain, surface_water: surface_water, population: population, image: image, residents: residents, films: episodes, url: url)
+    
+    return planet
+} // End - func generatePlanetFromJsonData
+
+
+func returnArrayOfAllPlanetsFromData(result: [AnyObject]) -> [Planet] {
+    
+    var arrayOfPlanets : [Planet] = []
+    
+    for object in result {
+
+        let planet = generatePlanetFromJsonData(dataPlanet: object)
+        
+        arrayOfPlanets.append(planet)
+    }
+    
+    return arrayOfPlanets
+    
+}
+
+
+/*
 func getArrayOfPlanets(numberOfPlanets : Int, completion: @escaping (Planet?, Int?) -> Void ) {
     
     var successCount = numberOfPlanets
@@ -142,11 +213,38 @@ func getArrayOfPlanets(numberOfPlanets : Int, completion: @escaping (Planet?, In
     }
     
 } // End - getArrayOfPlanets
-
+*/
 // ---------------------------------------------------------------------------------
 
 // MARK: - Get JSON from StarWars API
 
+
+func getPlanetsByID(id: Int, result: [AnyObject]) -> Planet? {
+    
+    var planet : Planet? = nil
+    
+    for object in result {
+        
+        // Comprobación que corresponde a la película
+        // Recogemos los episodios en los que aparece el personaje
+        let planetID = object["id"] as! Int
+        
+        if planetID == id {
+            
+            planet = generatePlanetFromJsonData(dataPlanet: object)
+            
+            return planet
+            
+        } // End - if
+        
+    } // End - for
+    
+    return planet
+    
+} // End - getPlanetsByID
+
+
+/*
 func getPlanetByID(value : Int, numberOfObjects: Int = 0, completion: @escaping (Planet?, Int?) -> Void ) {
     
     var successCount = numberOfObjects
@@ -239,7 +337,7 @@ func getPlanetByID(value : Int, numberOfObjects: Int = 0, completion: @escaping 
     task.resume()
     
 } // End - getPlanetByID
-
+*/
 // ---------------------------------------------------------------------------------
 
 // MARK: - Download Image from URL as per the planet name

@@ -133,6 +133,26 @@ class StarshipViewController: UITableViewController {
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
             
+            getArrayOfAllObjects(nameResource : "starships") {count, objects in
+                if let objects = objects {
+                    self.starships = returnArrayOfAllStarshipsFromData(result: objects)
+                    
+                    DispatchQueue.main.async {
+                        // Paramos la animación de carga
+                        self.activityIndicator.stopAnimating()
+                        
+                        // Recargar la tableView en el hilo principal
+                        self.tableView.reloadData()
+                    } // End - DispatchQueue
+                }
+            }
+            
+        } // End - DispatchQueue.global().async
+        
+        /*
+        // Ejecutamos en segundo plano la descarga de los datos desde la API
+        DispatchQueue.global().async {
+            
             // Realizamos el recuento de objetos para el recurso planets de la API
             getNumberOfObjects(nameResource: "starships", arrayObject : self.starships) { getObject in
                 
@@ -197,7 +217,7 @@ class StarshipViewController: UITableViewController {
             } // End - getNumberOfObjects
             
         } // End - DispatchQueue.global().async
-        
+        */
     } // End - downloadStarshipDataFromAPI()
     
     

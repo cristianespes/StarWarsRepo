@@ -68,7 +68,25 @@ class FilmDetail: UIViewController {
         
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
-                
+            
+           
+            getArrayOfAllObjects(nameResource : "people") {count, objects in
+                if let objects = objects {
+                    
+                    self.people = getArrayOfCharactersFromEpisode(film: self.film, result: objects)
+                    
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    } // End - DispatchQueue
+                }
+            }
+            
+        } // End - DispatchQueue.global().async
+        
+        /*
+        // Ejecutamos en segundo plano la descarga de los datos desde la API
+        DispatchQueue.global().async {
+            
                 // Ejecutamos la función para obtener el array con todos los personaje
                 getArrayOfCharactersFromFilm(film: self.film)
                 { getCharacter, successCount in
@@ -110,6 +128,7 @@ class FilmDetail: UIViewController {
                 } // End - getArrayOfCharactersFromFilm
             
         } // End - DispatchQueue.global().async
+         */
         
     } // End - downloadCharacterDataOfTheFilmFromAPI()
     

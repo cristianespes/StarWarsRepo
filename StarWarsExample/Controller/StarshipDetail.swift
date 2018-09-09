@@ -52,6 +52,28 @@ class StarshipDetail: UIViewController {
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
             
+            
+            getArrayOfAllObjects(nameResource : "people") {count, objects in
+                if let objects = objects {
+                    
+                    let people = getArrayOfCharactersFromStarship(starship: self.starship, result: objects)
+                    
+                    for person in people {
+                        self.pilots += [person.name]
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.starshipTableView.reloadData()
+                    } // End - DispatchQueue
+                }
+            }
+            
+        } // End - DispatchQueue.global().async
+        
+        /*
+        // Ejecutamos en segundo plano la descarga de los datos desde la API
+        DispatchQueue.global().async {
+            
             // Ejecutamos la función para obtener el array con todos los personaje
             getArrayOfCharactersFromStarship(starship: self.starship)
             { getCharacter, successCount in
@@ -92,6 +114,7 @@ class StarshipDetail: UIViewController {
             } // End - getArrayOfCharactersFromStarship
             
         } // End - DispatchQueue.global().async
+        */
         
     } // End - downloadCharacterDataOfTheStarshipFromAPI()
 

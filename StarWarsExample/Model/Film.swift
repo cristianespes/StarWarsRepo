@@ -13,6 +13,7 @@ import UIKit
 class Film {
     
     // Mark: - Properties
+    let id : Int
     let title : String
     let subtitle : String
     let opening_crawl: String
@@ -26,7 +27,8 @@ class Film {
     let planets: [Int]
     
     // Mark: - Initializations
-    init(title: String, subtitle : String, description: String, year: String, episode: Int, image: UIImage, url : Int, characters: [Int], director: String, producer: String, planets: [Int]) {
+    init(id: Int, title: String, subtitle : String, description: String, year: String, episode: Int, image: UIImage, url : Int, characters: [Int], director: String, producer: String, planets: [Int]) {
+        self.id = id
         self.title = title
         self.subtitle = subtitle
         self.opening_crawl = description
@@ -41,6 +43,7 @@ class Film {
     }
     
 } // End - class Film
+
 // ---------------------------------------------------------------------------------
 
 func returnArrayOfAllFilmsFromData(result: [AnyObject]) -> [Film] {
@@ -50,6 +53,7 @@ func returnArrayOfAllFilmsFromData(result: [AnyObject]) -> [Film] {
     for object in result {
         
         // Obtenemos los valores del diccionario
+        let id = object["id"] as! Int
         let title = object["title"] as! String
         let subtitle = object["subtitle"] as! String
         let description = object["opening_crawl"] as! String
@@ -59,7 +63,7 @@ func returnArrayOfAllFilmsFromData(result: [AnyObject]) -> [Film] {
 //        let filmNumber = convertStringToInt(string: auxFilm)
         let director = object["director"] as! String
         let producer = object["producer"] as! String
-        let auxUrl = object["director"] as! String
+        let auxUrl = object["url"] as! String
         let url = convertStringToInt(string: auxUrl)
         
         var year = object["release_date"] as! String
@@ -74,7 +78,7 @@ func returnArrayOfAllFilmsFromData(result: [AnyObject]) -> [Film] {
             year = "XX-XX-XXXX"
         }
         
-        // Recogemos los planetas de la película
+        // Recogemos los personajes de la película
         let auxCharacters = object["characters"] as! [String]
         var characters : [Int] = []
         for value in auxCharacters {
@@ -105,7 +109,7 @@ func returnArrayOfAllFilmsFromData(result: [AnyObject]) -> [Film] {
             }
         }
         
-        let film = Film(title: title, subtitle: subtitle, description: description, year: year, episode: episode, image: image, url: url, characters: characters, director: director, producer: producer, planets: planets)
+        let film = Film(id: id, title: title, subtitle: subtitle, description: description, year: year, episode: episode, image: image, url: url, characters: characters, director: director, producer: producer, planets: planets)
         
         arrayOfFilms.append(film)
     }

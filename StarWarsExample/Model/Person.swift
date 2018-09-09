@@ -11,6 +11,7 @@ import UIKit
 
 class Person {
     
+    let id : Int
     let name : String
     let birth_year : String
     let gender : String
@@ -23,11 +24,12 @@ class Person {
     let vehicles : [Int]
     let starships : [Int]
     let species : [Int]
-    /*let url : String*/
+    let url : Int
     var image : UIImage
     var films : [Int]
     
-    init(name: String, birth_year: String, gender: String, films: [Int], image: UIImage, height : String, mass : String, hair_color : String, skin_color : String, eye_color : String, homeworld: String, vehicles: [Int], starships: [Int], species: [Int]) {
+    init(id: Int, name: String, birth_year: String, gender: String, films: [Int], image: UIImage, height : String, mass : String, hair_color : String, skin_color : String, eye_color : String, homeworld: String, vehicles: [Int], starships: [Int], species: [Int], url: Int) {
+        self.id = id
         self.name = name
         self.birth_year = birth_year
         self.gender = gender
@@ -42,13 +44,14 @@ class Person {
         self.vehicles = vehicles
         self.starships = starships
         self.species = species
+        self.url = url
     }
 } // End - class Person
 
 // ---------------------------------------------------------------------------------
 // MARK: - Get JSON from StarWars API
 
-
+/*
 func getArrayOfCharacters(numberOfCharacters : Int, completion: @escaping (Person?, Int?) -> Void ) {
     
     // La API no devuelve el número total de Characters, hay que meterlo a mano
@@ -112,14 +115,15 @@ func getArrayOfCharacters(numberOfCharacters : Int, completion: @escaping (Perso
     }
     
 } // End - getArrayOfCharacters(numberOfCharacters : Int
-
+*/
 // ---------------------------------------------------------------------------------
 
 // Cargar los datos del personaje con los datos de la API
 
-func generatePersonFromJsonData(dataPerson: [String:Any]) -> Person {
+func generatePersonFromJsonData(dataPerson: AnyObject) -> Person {
     
     // Extraemos los valores del diccionario
+    let id = dataPerson["id"] as! Int
     let name = dataPerson["name"] as! String
     let gender = (dataPerson["gender"] as! String) == "none" || (dataPerson["gender"] as! String) == "n/a" ? "-" : (dataPerson["gender"] as! String).capitalizingFirstLetter()
     let birth_year = (dataPerson["birth_year"] as! String) == "unknown" ? "-" : dataPerson["birth_year"] as! String
@@ -129,10 +133,13 @@ func generatePersonFromJsonData(dataPerson: [String:Any]) -> Person {
     let skin_color = (dataPerson["skin_color"] as! String) == "none" || (dataPerson["skin_color"] as! String) == "unknown" ? "-" : (dataPerson["skin_color"] as! String).capitalizingFirstLetter()
     let eye_color = dataPerson["eye_color"] as! String == "unknown" || (dataPerson["eye_color"] as! String) == "none" ? "-" : (dataPerson["eye_color"] as! String).capitalizingFirstLetter()
     let homeworld = dataPerson["homeworld"] as! String == "unknown" || (dataPerson["homeworld"] as! String) == "none" ? "-" : (dataPerson["homeworld"] as! String).capitalizingFirstLetter()
+    let auxUrl = dataPerson["url"] as! String
+    let url = convertStringToInt(string: auxUrl)
     
     // Descarga la imagen desde Internet
     var image = #imageLiteral(resourceName: "contactIcon") // Imagen por defecto
-    if let url = URL(string: showCharacterFromUrl(characterName: name)) {
+    let imageUrl = dataPerson["image"] as! String
+    if let url = URL(string: imageUrl) {
         do {
             let data = try Data(contentsOf: url)
             if let downloadImage = UIImage(data: data) {
@@ -145,7 +152,7 @@ func generatePersonFromJsonData(dataPerson: [String:Any]) -> Person {
     }
     
     // Extraemos el array de films de cada personaje y lo convertimos a Int
-    let extractedFilms = dataPerson["films"] as! [String]
+    let extractedFilms = dataPerson["episodes"] as! [String]
     var films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
     films.sort{ $0 < $1 }
     
@@ -165,13 +172,46 @@ func generatePersonFromJsonData(dataPerson: [String:Any]) -> Person {
     species.sort{ $0 < $1 }
     
     // Almacenamos los valores obtenidos en una instancia de Planet
-    let person = Person(name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color, homeworld:  homeworld, vehicles: vehicles, starships: starships, species: species)
+    let person = Person(id: id, name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color, homeworld:  homeworld, vehicles: vehicles, starships: starships, species: species, url: url)
     
     return person
 } // End - func generatePersonFromJsonData
 
 // ---------------------------------------------------------------------------------
 
+func getArrayOfCharactersFromEpisode(film: Film, result: [AnyObject]) -> [Person] {
+    
+    var arrayOfPeople : [Person] = []
+    
+    for object in result {
+        
+        // Comprobación que corresponde a la película
+        // Recogemos los episodios en los que aparece el personaje
+        let auxEpisodes = object["episodes"] as! [String]
+        var episodes : [Int] = []
+        for value in auxEpisodes {
+            episodes += [convertStringToInt(string: value)]
+        }
+        
+        for episode in episodes {
+            
+            if episode == film.episode {
+                
+                let person = generatePersonFromJsonData(dataPerson: object)
+                
+                arrayOfPeople.append(person)
+            } // End -if
+            
+        } // End - for
+        
+    } // End - for
+    
+    return arrayOfPeople
+    
+} // End - getArrayOfCharactersFromEpisode
+
+
+/*
 func getArrayOfCharactersFromFilm(film : Film, completion: @escaping (Person?, Int?) -> Void ) {
     
     var successCount = film.characters.count
@@ -233,10 +273,34 @@ func getArrayOfCharactersFromFilm(film : Film, completion: @escaping (Person?, I
     }
     
 } // End - getArrayOfCharactersFromFilm(film : Film
-
+*/
 
 // ---------------------------------------------------------------------------------
 
+func getArrayOfCharactersFromPlanet(planet: Planet, result: [AnyObject]) -> [Person] {
+    
+    var arrayOfPeople : [Person] = []
+    
+    for object in result {
+        
+        // Comprobación que corresponde a la película
+        let auxPlanet = object["homeworld"] as! String
+        let planetID = convertStringToInt(string: auxPlanet)
+            
+            if planetID == planet.id {
+                
+                let person = generatePersonFromJsonData(dataPerson: object)
+                
+                arrayOfPeople.append(person)
+            } // End -if
+        
+    } // End - for
+    
+    return arrayOfPeople
+    
+} // End - getArrayOfCharactersFromPlanet
+
+/*
 func getArrayOfCharactersFromPlanet(planet : Planet, completion: @escaping (Person?, Int?) -> Void ) {
     
     var successCount = planet.residents.count
@@ -298,10 +362,43 @@ func getArrayOfCharactersFromPlanet(planet : Planet, completion: @escaping (Pers
     }
     
 } // End - getArrayOfCharactersFromPlanet
-
+*/
 
 // ---------------------------------------------------------------------------------
 
+
+func getArrayOfCharactersFromStarship(starship: Starship, result: [AnyObject]) -> [Person] {
+    
+    var arrayOfPeople : [Person] = []
+    
+    for object in result {
+        
+        // Comprobación que corresponde a la nave
+        let auxStarships = object["starships"] as! [String]
+        var starships : [Int] = []
+        for value in auxStarships {
+            starships += [convertStringToInt(string: value)]
+        }
+        starships.sort{ $0 < $1 }
+        
+        for value in starships {
+            
+            if value == starship.id {
+                
+                let person = generatePersonFromJsonData(dataPerson: object)
+                
+                arrayOfPeople.append(person)
+            } // End -if
+            
+        } // End - for
+        
+    } // End - for
+    
+    return arrayOfPeople
+    
+} // End - getArrayOfCharactersFromStarship
+
+/*
 func getArrayOfCharactersFromStarship(starship : Starship, completion: @escaping (Person?, Int?) -> Void ) {
     
     var successCount = starship.pilots.count
@@ -363,9 +460,9 @@ func getArrayOfCharactersFromStarship(starship : Starship, completion: @escaping
     }
     
 } // End - getArrayOfCharactersFromPlanet
-
+*/
 // ---------------------------------------------------------------------------------
-
+/*
 func getArrayOfCharactersByID(value : Int, numberOfObjects: Int = 0, completion: @escaping (Person?, Int?) -> Void ) {
     
     var successCount = numberOfObjects
@@ -424,6 +521,23 @@ func getArrayOfCharactersByID(value : Int, numberOfObjects: Int = 0, completion:
         task.resume()
     
 } // End - getArrayOfCharactersByID
+*/
+// ---------------------------------------------------------------------------------
+
+func returnArrayOfAllPeopleFromData(result: [AnyObject]) -> [Person] {
+    
+    var arrayOfPeople : [Person] = []
+    
+    for object in result {
+        
+        let person = generatePersonFromJsonData(dataPerson: object)
+        
+        arrayOfPeople.append(person)
+    }
+    
+    return arrayOfPeople
+    
+}
 
 // ---------------------------------------------------------------------------------
 

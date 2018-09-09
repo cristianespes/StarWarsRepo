@@ -60,6 +60,28 @@ class CharacterDetail: UIViewController {
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
             
+            
+            getArrayOfAllObjects(nameResource : "planets") {count, objects in
+                if let objects = objects {
+                    
+                    let planetID = convertStringToInt(string: self.person.homeworld)
+                    
+                    if let planet = getPlanetsByID(id: planetID, result: objects) {
+                        self.homeworld = planet.name
+                    }
+                    
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    } // End - DispatchQueue
+                }
+            }
+            
+        } // End - DispatchQueue.global().async
+        
+        /*
+        // Ejecutamos en segundo plano la descarga de los datos desde la API
+        DispatchQueue.global().async {
+            
             // Ejecutamos la función para obtener el array con todos los personaje
             getPlanetByID(value: convertStringToInt(string: self.person.homeworld))
             { getPlanet, successCount in
@@ -80,7 +102,7 @@ class CharacterDetail: UIViewController {
             } // End - getArrayOfCharactersFromFilm
             
         } // End - DispatchQueue.global().async
-        
+        */
     } // End - downloadPlanetDataOfTheCharacterFromAPI()
 
 } // End - class CharacterDetail

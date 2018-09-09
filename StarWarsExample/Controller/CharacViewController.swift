@@ -142,6 +142,26 @@ class CharacViewController: UITableViewController {
         // Ejecutamos en segundo plano la descarga de los datos desde la API
         DispatchQueue.global().async {
             
+            getArrayOfAllObjects(nameResource : "people") {count, objects in
+                if let objects = objects {
+                    self.people = returnArrayOfAllPeopleFromData(result: objects)
+                    
+                    DispatchQueue.main.async {
+                        // Paramos la animación de carga
+                        self.activityIndicator.stopAnimating()
+                        
+                        // Recargar la tableView en el hilo principal
+                        self.tableView.reloadData()
+                    } // End - DispatchQueue
+                }
+            }
+            
+        } // End - DispatchQueue.global().async
+        
+        /*
+        // Ejecutamos en segundo plano la descarga de los datos desde la API
+        DispatchQueue.global().async {
+            
             // Realizamos el recuento de objetos para el recurso people de la API
             getNumberOfObjects(nameResource: "people", arrayObject : self.people) { getObject in
                 
@@ -200,7 +220,7 @@ class CharacViewController: UITableViewController {
                 
             } // End - getNumberOfObjects
             
-        } // End - DispatchQueue.global().async
+        } // End - DispatchQueue.global().async*/
         
     } // End - downloadCharacterDataFromAPI()
     
