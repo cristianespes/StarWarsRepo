@@ -43,6 +43,8 @@ class ViewController: UITableViewController {
             tableView.addSubview(self.refresher)
         }
         
+        tableView.tableFooterView = UIView()
+        
         // Descargar datos de las películas de la API
         self.downloadFilmDataFromAPI()
         
@@ -166,15 +168,31 @@ class ViewController: UITableViewController {
     // MARK: - UITableViewDataSource
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if self.searchController.isActive && !searchBarIsEmpty() {
-            return self.searchResults.count
-        } else {
-            return self.films.count
-        }
+        
+                if self.searchController.isActive && !searchBarIsEmpty() {
+                    switch section {
+                    case 0:
+                        return self.searchResults.filter( { $0.subtitle.hasPrefix("Episode") } ).count
+                    case 1:
+                        return self.searchResults.filter( { $0.subtitle.hasPrefix("A Star Wars") } ).count
+                    default:
+                        return 0
+                    }
+                } else {
+                    switch section {
+                    case 0:
+                        return self.films.filter( { $0.subtitle.hasPrefix("Episode") } ).count
+                    case 1:
+                        return self.films.filter( { $0.subtitle.hasPrefix("A Star Wars") } ).count
+                    default:
+                        return 0
+                    }
+                }
+        
     }
     
     // Función para retornar el tamaño de la celda
@@ -183,52 +201,67 @@ class ViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let film : Film
+        
         if self.searchController.isActive && !searchBarIsEmpty() {
-            film = self.searchResults[indexPath.row]
+            switch indexPath.section {
+            case 0:
+                film = self.searchResults.filter( { $0.subtitle.hasPrefix("Episode") } )[indexPath.row]
+            default:
+                film =  self.searchResults.filter( { $0.subtitle.hasPrefix("A Star Wars") } )[indexPath.row]
+            }
         } else {
-            film = self.films[indexPath.row]
+            switch indexPath.section {
+            case 0:
+                film = self.films.filter( { $0.subtitle.hasPrefix("Episode") } )[indexPath.row]
+            default:
+                film =  self.films.filter( { $0.subtitle.hasPrefix("A Star Wars") } )[indexPath.row]
+            }
         }
+
         
         let cellID = "filmCell"
         let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! FilmCell
-        cell.thumbnailImageView.image = film.image
-        cell.titleLabel.text = film.title
-        cell.descriptionLabel.text = film.opening_crawl
-        cell.releaseYearLabel.text = "Premiere: " + film.release_date
-        cell.thumbnailImageView.layer.cornerRadius = 10.0
-        cell.thumbnailImageView.clipsToBounds = true
-        cell.accessoryType = .disclosureIndicator
         
-        /*
         switch indexPath.section {
         case 0:
-            if (film.subtitle.range(of:"Episode") != nil) {
+            if film.subtitle.hasPrefix("Episode") {
                 cell.thumbnailImageView.image = film.image
                 cell.titleLabel.text = film.title
                 cell.descriptionLabel.text = film.opening_crawl
                 cell.releaseYearLabel.text = "Premiere: " + film.release_date
-                
                 cell.thumbnailImageView.layer.cornerRadius = 10.0
                 cell.thumbnailImageView.clipsToBounds = true
-                
-                // Añadir felcha en el lado derecho
                 cell.accessoryType = .disclosureIndicator
             }
         default:
-            cell.thumbnailImageView.image = film.image
-            cell.titleLabel.text = film.title
-            cell.descriptionLabel.text = film.opening_crawl
-            cell.releaseYearLabel.text = "Premiere: " + film.release_date
-            
-            cell.thumbnailImageView.layer.cornerRadius = 10.0
-            cell.thumbnailImageView.clipsToBounds = true
-            
-            // Añadir felcha en el lado derecho
-            cell.accessoryType = .disclosureIndicator
-        }*/
+                cell.thumbnailImageView.image = film.image
+                cell.titleLabel.text = film.title
+                cell.descriptionLabel.text = film.opening_crawl
+                cell.releaseYearLabel.text = "Premiere: " + film.release_date
+                cell.thumbnailImageView.layer.cornerRadius = 10.0
+                cell.thumbnailImageView.clipsToBounds = true
+                cell.accessoryType = .disclosureIndicator
+        }
         
         return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+     
+        var title = ""
+     
+        switch section {
+        case 0:
+                title = "EPISODES"
+        case 1:
+            title = "STAR WARS STORIES"
+        default:
+            break
+        }
+     
+        return title
     }
     
     
@@ -246,9 +279,19 @@ class ViewController: UITableViewController {
                 // Le pasamos el objeto
                 let selectedFilm : Film
                 if self.searchController.isActive{
-                    selectedFilm = self.searchResults[indexPath.row]
+                    switch indexPath.section {
+                    case 0:
+                        selectedFilm = self.searchResults.filter( { $0.subtitle.hasPrefix("Episode") } )[indexPath.row]
+                    default:
+                        selectedFilm =  self.searchResults.filter( { $0.subtitle.hasPrefix("A Star Wars") } )[indexPath.row]
+                    }
                 } else {
-                    selectedFilm = self.films[indexPath.row]
+                    switch indexPath.section {
+                    case 0:
+                        selectedFilm = self.films.filter( { $0.subtitle.hasPrefix("Episode") } )[indexPath.row]
+                    default:
+                        selectedFilm =  self.films.filter( { $0.subtitle.hasPrefix("A Star Wars") } )[indexPath.row]
+                    }
                 }
                 
                 //let selectedFilm = self.films[indexPath.row]

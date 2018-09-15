@@ -49,74 +49,8 @@ class Person {
 } // End - class Person
 
 // ---------------------------------------------------------------------------------
-// MARK: - Get JSON from StarWars API
 
-/*
-func getArrayOfCharacters(numberOfCharacters : Int, completion: @escaping (Person?, Int?) -> Void ) {
-    
-    // La API no devuelve el número total de Characters, hay que meterlo a mano
-    var successCount = 88// numberOfCharacters
-    let totalOfCharacters = 88 // numberOfCharacters
-    
-    for value in 1...totalOfCharacters {
-        
-        let urlString = "https://swapi.co/api/people/\(value)/?format=json"
-        
-        // Check that the URL we’ve provided is valid
-        guard let urlRequest = URL(string: urlString) else {
-            print("Error: cannot create URL")
-            completion(nil, nil)
-            return
-        }
-        
-        
-        // Then we need a URLSession to use to send the request
-        let session = URLSession.shared
-        
-        // Then create the data task
-        let task = session.dataTask(with: urlRequest) { (data, _, error) in
-            // can't do print(response) since we don't have response
-            
-            // Check if any error exists
-            if let error = error {
-                print(error)
-                successCount -= 1
-                completion(nil, nil)
-                return
-            }
-            
-            guard let datos = data else {return}
-            
-            do {
-                let dataPerson = try JSONSerialization.jsonObject(with: datos) as! [String:Any]
-                
-                // Comprobación de que el objeto existe o no está vacío
-                if let error = dataPerson["detail"] as? String {
-                    print("Error: Data \(value) \(error)")
-                    // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
-                    successCount -= 1
-                    completion(nil, successCount)
-                    return
-                }
-                
-                // Generamos la persona con los datos del diccionario
-                let person = generatePersonFromJsonData(dataPerson: dataPerson)
-                
-                completion(person, successCount)
-                
-            } catch {
-                successCount -= 1
-                debugPrint(error)
-            }
-        }
-        
-        // And finally send it
-        task.resume()
-    }
-    
-} // End - getArrayOfCharacters(numberOfCharacters : Int
-*/
-// ---------------------------------------------------------------------------------
+// MARK: - Get Person objects from JSON data
 
 // Cargar los datos del personaje con los datos de la API
 
@@ -152,24 +86,16 @@ func generatePersonFromJsonData(dataPerson: AnyObject) -> Person {
     }
     
     // Extraemos el array de films de cada personaje y lo convertimos a Int
-    let extractedFilms = dataPerson["episodes"] as! [String]
-    var films : [Int] = convertArrayStringToInt(arrayOfString: extractedFilms)
-    films.sort{ $0 < $1 }
+    let films : [Int] = convertArrayStringToInt(arrayOfString: (dataPerson["episodes"] as! [String])).sorted()
     
     // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
-    let extractedVehicles = dataPerson["vehicles"] as! [String]
-    var vehicles : [Int] = convertArrayStringToInt(arrayOfString: extractedVehicles)
-    vehicles.sort{ $0 < $1 }
+    let vehicles : [Int] = convertArrayStringToInt(arrayOfString: (dataPerson["vehicles"] as! [String])).sorted()
     
     // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
-    let extractedStarships = dataPerson["starships"] as! [String]
-    var starships : [Int] = convertArrayStringToInt(arrayOfString: extractedStarships)
-    starships.sort{ $0 < $1 }
+    let starships : [Int] = convertArrayStringToInt(arrayOfString: (dataPerson["starships"] as! [String])).sorted()
     
     // Extraemos el array de vehicles de cada personaje y lo convertimos a Int
-    let extractedSpecies = dataPerson["species"] as! [String]
-    var species : [Int] = convertArrayStringToInt(arrayOfString: extractedSpecies)
-    species.sort{ $0 < $1 }
+    let species : [Int] = convertArrayStringToInt(arrayOfString: (dataPerson["species"] as! [String])).sorted()
     
     // Almacenamos los valores obtenidos en una instancia de Planet
     let person = Person(id: id, name: name, birth_year: birth_year, gender: gender, films: films, image: image, height: height, mass: mass, hair_color: hair_color, skin_color: skin_color, eye_color: eye_color, homeworld:  homeworld, vehicles: vehicles, starships: starships, species: species, url: url)
@@ -183,97 +109,24 @@ func getArrayOfCharactersFromEpisode(film: Film, result: [AnyObject]) -> [Person
     
     var arrayOfPeople : [Person] = []
     
-    for object in result {
+    result.forEach { object in
         
         // Comprobación que corresponde a la película
         // Recogemos los episodios en los que aparece el personaje
         let auxEpisodes = object["episodes"] as! [String]
-        var episodes : [Int] = []
-        for value in auxEpisodes {
-            episodes += [convertStringToInt(string: value)]
+        let episodes : [Int] = auxEpisodes.map { convertStringToInt(string: $0) }
+        
+        episodes.forEach {
+            if $0 == film.episode {
+                arrayOfPeople.append(generatePersonFromJsonData(dataPerson: object))
+            }
         }
         
-        for episode in episodes {
-            
-            if episode == film.episode {
-                
-                let person = generatePersonFromJsonData(dataPerson: object)
-                
-                arrayOfPeople.append(person)
-            } // End -if
-            
-        } // End - for
-        
-    } // End - for
+    } // End - forEach
     
-    return arrayOfPeople
+    return arrayOfPeople.sorted { $0.name < $1.name }
     
 } // End - getArrayOfCharactersFromEpisode
-
-
-/*
-func getArrayOfCharactersFromFilm(film : Film, completion: @escaping (Person?, Int?) -> Void ) {
-    
-    var successCount = film.characters.count
-    
-    for value in film.characters {
-        
-        let urlString = "https://swapi.co/api/people/\(value)/?format=json"
-        
-        // Check that the URL we’ve provided is valid
-        guard let urlRequest = URL(string: urlString) else {
-            print("Error: cannot create URL")
-            completion(nil, nil)
-            return
-        }
-        
-        
-        // Then we need a URLSession to use to send the request
-        let session = URLSession.shared
-        
-        // Then create the data task
-        let task = session.dataTask(with: urlRequest) { (data, _, error) in
-            // can't do print(response) since we don't have response
-            
-            // Check if any error exists
-            if let error = error {
-                print(error)
-                successCount -= 1
-                completion(nil, nil)
-                return
-            }
-            
-            guard let datos = data else {return}
-            
-            do {
-                let dataPerson = try JSONSerialization.jsonObject(with: datos) as! [String:Any]
-                
-                // Comprobación de que el objeto existe o no está vacío
-                if let error = dataPerson["detail"] as? String {
-                    print("Error: Data \(value) \(error)")
-                    // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
-                    successCount -= 1
-                    completion(nil, successCount)
-                    return
-                }
-                
-                // Obtenemos los valores del diccionario
-                let person = generatePersonFromJsonData(dataPerson: dataPerson)
- 
-                completion(person, successCount)
-                
-            } catch {
-                successCount -= 1
-                debugPrint(error)
-            }
-        }
-        
-        // And finally send it
-        task.resume()
-    }
-    
-} // End - getArrayOfCharactersFromFilm(film : Film
-*/
 
 // ---------------------------------------------------------------------------------
 
@@ -281,186 +134,45 @@ func getArrayOfCharactersFromPlanet(planet: Planet, result: [AnyObject]) -> [Per
     
     var arrayOfPeople : [Person] = []
     
-    for object in result {
-        
+    result.forEach {
         // Comprobación que corresponde a la película
-        let auxPlanet = object["homeworld"] as! String
-        let planetID = convertStringToInt(string: auxPlanet)
+        let planetID = convertStringToInt(string: ($0["homeworld"] as! String))
             
             if planetID == planet.id {
-                
-                let person = generatePersonFromJsonData(dataPerson: object)
-                
-                arrayOfPeople.append(person)
+                arrayOfPeople.append(generatePersonFromJsonData(dataPerson: $0))
             } // End -if
         
-    } // End - for
+    } // End - forEach
     
-    return arrayOfPeople
-    
-} // End - getArrayOfCharactersFromPlanet
-
-/*
-func getArrayOfCharactersFromPlanet(planet : Planet, completion: @escaping (Person?, Int?) -> Void ) {
-    
-    var successCount = planet.residents.count
-    
-    for value in planet.residents {
-        
-        let urlString = "https://swapi.co/api/people/\(value)/?format=json"
-        
-        // Check that the URL we’ve provided is valid
-        guard let urlRequest = URL(string: urlString) else {
-            print("Error: cannot create URL")
-            completion(nil, nil)
-            return
-        }
-        
-        
-        // Then we need a URLSession to use to send the request
-        let session = URLSession.shared
-        
-        // Then create the data task
-        let task = session.dataTask(with: urlRequest) { (data, _, error) in
-            // can't do print(response) since we don't have response
-            
-            // Check if any error exists
-            if let error = error {
-                print(error)
-                successCount -= 1
-                completion(nil, nil)
-                return
-            }
-            
-            guard let datos = data else {return}
-            
-            do {
-                let dataPerson = try JSONSerialization.jsonObject(with: datos) as! [String:Any]
-                
-                // Comprobación de que el objeto existe o no está vacío
-                if let error = dataPerson["detail"] as? String {
-                    print("Error: Data \(value) \(error)")
-                    // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
-                    successCount -= 1
-                    completion(nil, successCount)
-                    return
-                }
-
-                // Obtenemos los valores del diccionario
-                let person = generatePersonFromJsonData(dataPerson: dataPerson)
-                
-                completion(person, successCount)
-                
-            } catch {
-                successCount -= 1
-                debugPrint(error)
-            }
-        }
-        
-        // And finally send it
-        task.resume()
-    }
+    return arrayOfPeople.sorted { $0.name < $1.name }
     
 } // End - getArrayOfCharactersFromPlanet
-*/
 
 // ---------------------------------------------------------------------------------
-
 
 func getArrayOfCharactersFromStarship(starship: Starship, result: [AnyObject]) -> [Person] {
     
     var arrayOfPeople : [Person] = []
     
-    for object in result {
+    result.forEach { object in
         
         // Comprobación que corresponde a la nave
         let auxStarships = object["starships"] as! [String]
-        var starships : [Int] = []
-        for value in auxStarships {
-            starships += [convertStringToInt(string: value)]
-        }
+        var starships : [Int] = auxStarships.map { convertStringToInt(string: $0) }
         starships.sort{ $0 < $1 }
         
-        for value in starships {
-            
-            if value == starship.id {
-                
-                let person = generatePersonFromJsonData(dataPerson: object)
-                
-                arrayOfPeople.append(person)
+        starships.forEach {
+            if $0 == starship.id {
+                arrayOfPeople.append(generatePersonFromJsonData(dataPerson: object))
             } // End -if
-            
-        } // End - for
+        } // End - forEach
         
     } // End - for
     
-    return arrayOfPeople
+    return arrayOfPeople.sorted { $0.name < $1.name }
     
 } // End - getArrayOfCharactersFromStarship
 
-/*
-func getArrayOfCharactersFromStarship(starship : Starship, completion: @escaping (Person?, Int?) -> Void ) {
-    
-    var successCount = starship.pilots.count
-    
-    for value in starship.pilots {
-        
-        let urlString = "https://swapi.co/api/people/\(value)/?format=json"
-        
-        // Check that the URL we’ve provided is valid
-        guard let urlRequest = URL(string: urlString) else {
-            print("Error: cannot create URL")
-            completion(nil, nil)
-            return
-        }
-        
-        
-        // Then we need a URLSession to use to send the request
-        let session = URLSession.shared
-        
-        // Then create the data task
-        let task = session.dataTask(with: urlRequest) { (data, _, error) in
-            // can't do print(response) since we don't have response
-            
-            // Check if any error exists
-            if let error = error {
-                print(error)
-                successCount -= 1
-                completion(nil, nil)
-                return
-            }
-            
-            guard let datos = data else {return}
-            
-            do {
-                let dataPerson = try JSONSerialization.jsonObject(with: datos) as! [String:Any]
-                
-                // Comprobación de que el objeto existe o no está vacío
-                if let error = dataPerson["detail"] as? String {
-                    print("Error: Data \(value) \(error)")
-                    // Retiramos al contador un objeto erroneo para que contabilice solo los exitosos
-                    successCount -= 1
-                    completion(nil, successCount)
-                    return
-                }
-                
-                // Obtenemos los valores del diccionario
-                let person = generatePersonFromJsonData(dataPerson: dataPerson)
-                
-                completion(person, successCount)
-                
-            } catch {
-                successCount -= 1
-                debugPrint(error)
-            }
-        }
-        
-        // And finally send it
-        task.resume()
-    }
-    
-} // End - getArrayOfCharactersFromPlanet
-*/
 // ---------------------------------------------------------------------------------
 /*
 func getArrayOfCharactersByID(value : Int, numberOfObjects: Int = 0, completion: @escaping (Person?, Int?) -> Void ) {
@@ -525,18 +237,7 @@ func getArrayOfCharactersByID(value : Int, numberOfObjects: Int = 0, completion:
 // ---------------------------------------------------------------------------------
 
 func returnArrayOfAllPeopleFromData(result: [AnyObject]) -> [Person] {
-    
-    var arrayOfPeople : [Person] = []
-    
-    for object in result {
-        
-        let person = generatePersonFromJsonData(dataPerson: object)
-        
-        arrayOfPeople.append(person)
-    }
-    
-    return arrayOfPeople
-    
+    return result.map { generatePersonFromJsonData(dataPerson: $0) }.sorted { $0.name < $1.name }
 }
 
 // ---------------------------------------------------------------------------------

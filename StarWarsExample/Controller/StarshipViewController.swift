@@ -42,6 +42,9 @@ class StarshipViewController: UITableViewController {
             self.tableView.addSubview(self.refresher)
         }
         
+        // Elimina las líneas de las filas vacías
+        tableView.tableFooterView = UIView()
+        
         // Descargar datos de las películas de la API
         self.downloadStarshipDataFromAPI()
     }
@@ -149,75 +152,6 @@ class StarshipViewController: UITableViewController {
             
         } // End - DispatchQueue.global().async
         
-        /*
-        // Ejecutamos en segundo plano la descarga de los datos desde la API
-        DispatchQueue.global().async {
-            
-            // Realizamos el recuento de objetos para el recurso planets de la API
-            getNumberOfObjects(nameResource: "starships", arrayObject : self.starships) { getObject in
-                
-                // Si recibe el número de peliculas
-                guard let numberOfObjects = getObject else {
-                    // Si no las llega a recibir
-                    print("Ocurrió un error")
-                    return
-                }
-                
-                // Ejecutamos la función para obtener el array con todos los personajes
-                getArrayOfStarships(numberOfStarships: numberOfObjects) { getStarship, successCount in
-                    
-                    guard let finalCount = successCount else { return }
-                    
-                    guard let checkStarship = getStarship else {
-                        
-                        // Si llegamos aquí, no ha llegado ningún objeto
-                        
-                        // Si coincide con el último, actualizar la tabla
-                        if finalCount == self.starships.count {
-                            // Enviamos al hilo principal las siguientes acciones
-                            DispatchQueue.main.async {
-                                // Paramos la animación de carga
-                                self.activityIndicator.stopAnimating()
-                                
-                                // Recargar la tableView en el hilo principal
-                                self.tableView.reloadData()
-                            } // End - DispatchQueue
-                        } // End - if
-                        
-                        return
-                        
-                    } // End - guard let checkStarship = getStarship
-                    
-                    
-                    // Si llegamos aquí, ha llegado un objeto
-                    
-                    // Añadir nuevo personaje al array
-                    self.starships += [checkStarship]
-                    
-                    // Reordenamos el array de Personales por orden de episodios
-                    self.starships.sort{ $0.name < $1.name}
-                    
-                    
-                    // Si estamos ante el último objeto
-                    if finalCount == self.starships.count {
-                        // Enviamos al hilo principal las siguientes acciones
-                        DispatchQueue.main.async {
-                            
-                            // Paramos la animación de carga
-                            self.activityIndicator.stopAnimating()
-                            
-                            // Recargar la tableView en el hilo principal
-                            self.tableView.reloadData()
-                            
-                        } // End - DispatchQueue
-                    } // End - if
-                    
-                } // End - getArrayOfPlanets
-                
-            } // End - getNumberOfObjects
-            
-        } // End - DispatchQueue.global().async
-        */
     } // End - downloadStarshipDataFromAPI()
     
     

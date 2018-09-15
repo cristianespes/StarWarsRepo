@@ -48,25 +48,23 @@ class Film {
 
 func returnArrayOfAllFilmsFromData(result: [AnyObject]) -> [Film] {
     
-    var arrayOfFilms : [Film] = []
-    
-    for object in result {
+    return result.map {
         
         // Obtenemos los valores del diccionario
-        let id = object["id"] as! Int
-        let title = object["title"] as! String
-        let subtitle = object["subtitle"] as! String
-        let description = object["opening_crawl"] as! String
-        let auxEpisode = object["episode"] as! String
+        let id = $0["id"] as! Int
+        let title = $0["title"] as! String
+        let subtitle = $0["subtitle"] as! String
+        let description = $0["opening_crawl"] as! String
+        let auxEpisode = $0["episode"] as! String
         let episode = convertStringToInt(string: auxEpisode)
 //        let auxFilm = object["film"] as! String
 //        let filmNumber = convertStringToInt(string: auxFilm)
-        let director = object["director"] as! String
-        let producer = object["producer"] as! String
-        let auxUrl = object["url"] as! String
+        let director = $0["director"] as! String
+        let producer = $0["producer"] as! String
+        let auxUrl = $0["url"] as! String
         let url = convertStringToInt(string: auxUrl)
         
-        var year = object["release_date"] as! String
+        var year = $0["release_date"] as! String
         if year != "" {
             // Convertimos la fecha: yyyy-MM-dd => dd-MM-yyyy
             let dateFormatter = DateFormatter()
@@ -79,24 +77,16 @@ func returnArrayOfAllFilmsFromData(result: [AnyObject]) -> [Film] {
         }
         
         // Recogemos los personajes de la película
-        let auxCharacters = object["characters"] as! [String]
-        var characters : [Int] = []
-        for value in auxCharacters {
-            characters += [convertStringToInt(string: value)]
-        }
-        characters.sort{ $0 < $1 }
+        let auxCharacters = $0["characters"] as! [String]
+        let characters = auxCharacters.compactMap { convertStringToInt(string: $0) }.sorted()
         
         // Recogemos los planetas de la película
-        let auxPlanets = object["planets"] as! [String]
-        var planets : [Int] = []
-        for value in auxPlanets {
-            planets += [convertStringToInt(string: value)]
-        }
-        planets.sort{ $0 < $1 }
+        let auxPlanets = $0["planets"] as! [String]
+        let planets : [Int] = auxPlanets.compactMap { convertStringToInt(string: $0) }.sorted()
         
         // Descarga la imagen desde Internet
         var image = #imageLiteral(resourceName: "filmIcon") // Imagen por defecto
-        let imageUrl = object["image"] as! String
+        let imageUrl = $0["image"] as! String
         if let url = URL(string: imageUrl) {
             do {
                 let data = try Data(contentsOf: url)
@@ -111,9 +101,7 @@ func returnArrayOfAllFilmsFromData(result: [AnyObject]) -> [Film] {
         
         let film = Film(id: id, title: title, subtitle: subtitle, description: description, year: year, episode: episode, image: image, url: url, characters: characters, director: director, producer: producer, planets: planets)
         
-        arrayOfFilms.append(film)
+        return film
     }
-    
-    return arrayOfFilms
     
 }

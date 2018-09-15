@@ -35,6 +35,9 @@ class PlanetDetail: UIViewController {
             navigationItem.largeTitleDisplayMode = .never
         }
         
+        // Elimina las líneas de las filas vacías
+        planetTableView.tableFooterView = UIView()
+        
         downloadCharacterDataOfThePlanetFromAPI()
     }
 
@@ -56,9 +59,7 @@ class PlanetDetail: UIViewController {
                     
                      let people = getArrayOfCharactersFromPlanet(planet: self.planet, result: objects)
                     
-                    for person in people {
-                        self.residents += [person.name]
-                    }
+                    people.forEach { self.residents += [$0.name] }
                     
                     DispatchQueue.main.async {
                         self.planetTableView.reloadData()
@@ -68,50 +69,6 @@ class PlanetDetail: UIViewController {
             
         } // End - DispatchQueue.global().async
         
-        /*
-        // Ejecutamos en segundo plano la descarga de los datos desde la API
-        DispatchQueue.global().async {
-            
-            // Ejecutamos la función para obtener el array con todos los personaje
-            getArrayOfCharactersFromPlanet(planet: self.planet)
-            { getCharacter, successCount in
-                
-                guard let finalCount = successCount else { return }
-                
-                guard let checkCharacter = getCharacter else {
-                    
-                    if finalCount == self.residents.count {
-                        // Enviamos al hilo principal las siguientes acciones
-                        DispatchQueue.main.async {
-                            // Recargar la tableView en el hilo principal
-                            self.planetTableView.reloadData()
-                        } // End - DispatchQueue
-                    } // End - if
-                    
-                    return
-                } // End - guard
-                
-                // Añadir nuevo personaje al array
-                self.residents += [checkCharacter.name]
-                
-                // Reordenamos el array de Personales por orden de episodios
-                self.residents.sort{ $0 < $1}
-
-                
-                if finalCount == self.residents.count {
-                    // Enviamos al hilo principal las siguientes acciones
-                    DispatchQueue.main.async {
-                        
-                        // Recargar la tableView en el hilo principal
-                        self.planetTableView.reloadData()
-                        
-                    } // End - DispatchQueue
-                } // End - if
-                
-            } // End - getArrayOfCharactersFromFilm
-            
-        } // End - DispatchQueue.global().async
-        */
     } // End - downloadCharacterDataOfThePlanetFromAPI()
     
     

@@ -43,6 +43,9 @@ class CharacViewController: UITableViewController {
             tableView.addSubview(self.refresher)
         }
         
+        // Elimina las líneas de las filas vacías
+        tableView.tableFooterView = UIView()
+        
         // Descargar datos de las películas de la API
         self.downloadCharacterDataFromAPI()
         
@@ -256,10 +259,6 @@ class CharacViewController: UITableViewController {
         cell.genderLabel.text = person.gender
         cell.birthLabel.text = person.birth_year
         
-        /*
-        cell.thumbnailImageView.getImgFromUrl(link: showCharacterFromUrl(characterName: person.name), placeholder: #imageLiteral(resourceName: "contactIcon"), index: Int(indexPath.row)) { (image, index) in
-            self.people[index].image = image
-        }*/
         cell.thumbnailImageView.image = person.image
         
         cell.thumbnailImageView.layer.cornerRadius = 5.0

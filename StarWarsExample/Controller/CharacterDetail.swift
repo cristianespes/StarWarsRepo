@@ -38,6 +38,9 @@ class CharacterDetail: UIViewController {
             navigationItem.largeTitleDisplayMode = .never
         }
         
+        // Elimina las líneas de las filas vacías
+        tableView.tableFooterView = UIView()
+        
         downloadPlanetDataOfTheCharacterFromAPI()
         
     } // End - viewDidLoad
@@ -66,7 +69,7 @@ class CharacterDetail: UIViewController {
                     
                     let planetID = convertStringToInt(string: self.person.homeworld)
                     
-                    if let planet = getPlanetsByID(id: planetID, result: objects) {
+                    if let planet = getPlanetByID(id: planetID, result: objects) {
                         self.homeworld = planet.name
                     }
                     

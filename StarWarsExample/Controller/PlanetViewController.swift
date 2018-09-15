@@ -42,6 +42,9 @@ class PlanetViewController: UITableViewController {
             self.tableView.addSubview(self.refresher)
         }
         
+        // Elimina las líneas de las filas vacías
+        tableView.tableFooterView = UIView()
+        
         // Descargar datos de las películas de la API
         self.downloadPlanetDataFromAPI()
     }
@@ -153,74 +156,6 @@ class PlanetViewController: UITableViewController {
             
         } // End - DispatchQueue.global().async
         
-        /*
-        // Ejecutamos en segundo plano la descarga de los datos desde la API
-        DispatchQueue.global().async {
-            
-            // Realizamos el recuento de objetos para el recurso planets de la API
-            getNumberOfObjects(nameResource: "planets", arrayObject : self.planets) { getObject in
-                
-                // Si recibe el número de peliculas
-                guard let numberOfObjects = getObject else {
-                    // Si no las llega a recibir
-                    print("Ocurrió un error")
-                    return
-                }
-                
-                // Ejecutamos la función para obtener el array con todos los personajes
-                getArrayOfPlanets(numberOfPlanets: numberOfObjects) { getPlanet, successCount in
-                    
-                    guard let finalCount = successCount else { return }
-                    
-                    guard let checkPlanet = getPlanet else {
-                        
-                        // Si llegamos aquí, no ha llegado ningún objeto
-                        
-                        // Si coincide con el último, actualizar la tabla
-                        if finalCount == self.planets.count {
-                            // Enviamos al hilo principal las siguientes acciones
-                            DispatchQueue.main.async {
-                                // Paramos la animación de carga
-                                self.activityIndicator.stopAnimating()
-                                
-                                // Recargar la tableView en el hilo principal
-                                self.tableView.reloadData()
-                            } // End - DispatchQueue
-                        } // End - if
-                        
-                        return
-                    }
-                    
-                    // Si llegamos aquí, ha llegado un objeto
-                    
-                    // Añadir nuevo personaje al array
-                    self.planets += [checkPlanet]
-                    
-                    // Reordenamos el array de Personales por orden de episodios
-                    self.planets.sort{ $0.name < $1.name}
-                    
-                    
-                    // Si estamos ante el último objeto
-                    if finalCount == self.planets.count {
-                        // Enviamos al hilo principal las siguientes acciones
-                        DispatchQueue.main.async {
-                            
-                            // Paramos la animación de carga
-                            self.activityIndicator.stopAnimating()
-                            
-                            // Recargar la tableView en el hilo principal
-                            self.tableView.reloadData()
-                            
-                        } // End - DispatchQueue
-                    } // End - if
-                    
-                } // End - getArrayOfPlanets
-                
-            } // End - getNumberOfObjects
-            
-        } // End - DispatchQueue.global().async
-        */
-        
     } // End - downloadPlanetDataFromAPI()
     
 
@@ -253,11 +188,6 @@ class PlanetViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellID, for: indexPath) as! PlanetCell
         
         cell.nameLabel.text = planet.name
-        
-        /*
-        cell.planetImageView.getImgFromUrl(link: showPlanetFromUrl(planetName: planet.name), placeholder: #imageLiteral(resourceName: "planetIcon"), index: Int(indexPath.row)) { (image, index) in
-            self.planets[index].image = image
-        }*/
         
         cell.planetImageView.image = planet.image
         

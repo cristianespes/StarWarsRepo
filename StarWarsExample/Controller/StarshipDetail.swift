@@ -36,6 +36,9 @@ class StarshipDetail: UIViewController {
             navigationItem.largeTitleDisplayMode = .never
         }
         
+        // Elimina las líneas de las filas vacías
+        starshipTableView.tableFooterView = UIView()
+        
         downloadCharacterDataOfTheStarshipFromAPI()
     }
 
@@ -58,9 +61,7 @@ class StarshipDetail: UIViewController {
                     
                     let people = getArrayOfCharactersFromStarship(starship: self.starship, result: objects)
                     
-                    for person in people {
-                        self.pilots += [person.name]
-                    }
+                    people.forEach { self.pilots += [$0.name] }
                     
                     DispatchQueue.main.async {
                         self.starshipTableView.reloadData()
@@ -69,52 +70,6 @@ class StarshipDetail: UIViewController {
             }
             
         } // End - DispatchQueue.global().async
-        
-        /*
-        // Ejecutamos en segundo plano la descarga de los datos desde la API
-        DispatchQueue.global().async {
-            
-            // Ejecutamos la función para obtener el array con todos los personaje
-            getArrayOfCharactersFromStarship(starship: self.starship)
-            { getCharacter, successCount in
-                
-                guard let finalCount = successCount else { return }
-                
-                guard let checkCharacter = getCharacter else {
-                    
-                    // Si coincide con el último, actualizar la tabla
-                    if finalCount == self.pilots.count {
-                        // Enviamos al hilo principal las siguientes acciones
-                        DispatchQueue.main.async {
-                            // Recargar la tableView en el hilo principal
-                            self.starshipTableView.reloadData()
-                        } // End - DispatchQueue
-                    } // End - if
-                    
-                    return
-                }
-                
-                // Añadir nuevo personaje al array
-                self.pilots += [checkCharacter.name]
-                
-                // Reordenamos el array de Personales por orden de episodios
-                self.pilots.sort{ $0 < $1 }
-                
-                
-                if finalCount == self.pilots.count {
-                    // Enviamos al hilo principal las siguientes acciones
-                    DispatchQueue.main.async {
-                        
-                        // Recargar la tableView en el hilo principal
-                        self.starshipTableView.reloadData()
-                        
-                    } // End - DispatchQueue
-                } // End - if
-                
-            } // End - getArrayOfCharactersFromStarship
-            
-        } // End - DispatchQueue.global().async
-        */
         
     } // End - downloadCharacterDataOfTheStarshipFromAPI()
 

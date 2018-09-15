@@ -78,8 +78,8 @@ func convertArrayStringToInt(arrayOfString: [String]) -> [Int] {
     
     var arrayOfNumber : [Int] = []
     
-    for value in arrayOfString {
-        if let number = Int(value.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()) {
+    arrayOfString.forEach {
+        if let number = Int($0.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()) {
             arrayOfNumber += [number]
         }
     }
@@ -103,14 +103,7 @@ func convertStringToInt(string: String) -> Int {
 // ---------------------------------------------------------------------------------
 
 func convertArrayIntToString(arrayOfInt: [Int]) -> [String] {
-    
-    var arrayOfString : [String] = []
-    
-    for value in arrayOfInt {
-        arrayOfString += ["\(value)"]
-    }
-    
-    return arrayOfString
+    return arrayOfInt.map { "\($0)" }
 }
 
 // ---------------------------------------------------------------------------------
@@ -157,53 +150,6 @@ func startActivityIndicator(activityIndicator: UIActivityIndicatorView, view: UI
     // Añadir el Activity Indicator a la vista
     view.addSubview(activityIndicator)
 }
-
-// ---------------------------------------------------------------------------------
-// MARK: - Get JSON from StarWars API
-
-func getNumberOfObjects(nameResource: String, arrayObject : [AnyObject], completion: @escaping (Int?) -> Void ) {
-    
-    let urlString = "https://swapi.co/api/\(nameResource)/?format=json"
-    
-    // Check that the URL we’ve provided is valid
-    guard let urlRequest = URL(string: urlString) else {
-        print("Error: cannot create URL")
-        completion(nil)
-        return
-    }
-    
-    // Then we need a URLSession to use to send the request
-    let session = URLSession.shared
-    
-    // Then create the data task
-    let task = session.dataTask(with: urlRequest) { (data, _, error) in
-        // can't do print(response) since we don't have response
-        
-        // Check if any error exists
-        if let error = error {
-            print(error)
-            completion(nil)
-            return
-        }
-        
-        guard let datos = data else {return}
-        
-        DispatchQueue.main.async {
-            do {
-                let dataResource = try JSONDecoder().decode(Resource.self, from: datos)
-                //print(dataResource.count)
-                completion(dataResource.count)
-            } catch {
-                debugPrint(error)
-            }
-        }
-        
-    }
-    
-    // And finally send it
-    task.resume()
-    
-} // End - getNumberOfObjects
 
 // ---------------------------------------------------------------------------------
 // MARK: - Apply .uppercaseString to only the first letter of a string
